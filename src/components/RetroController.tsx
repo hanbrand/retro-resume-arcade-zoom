@@ -58,39 +58,64 @@ const RetroController = () => {
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-      <div className="bg-arcade-darkPurple border-2 border-arcade-purple/50 rounded-xl p-4 backdrop-blur-sm flex items-center gap-8">
-        {/* Joystick */}
-        <div className="relative">
-          <div className={`transform transition-transform duration-150 ${
-            joystickDirection === 'up' ? '-translate-y-2' :
-            joystickDirection === 'down' ? 'translate-y-2' :
-            joystickDirection === 'left' ? '-translate-x-2' :
-            joystickDirection === 'right' ? 'translate-x-2' : ''
-          }`}>
-            <Joystick size={32} className="text-arcade-cyan" />
+      <div className="bg-arcade-darkPurple/90 border-2 border-arcade-purple/50 rounded-xl p-8 backdrop-blur-sm transform perspective-1000 rotate-x-12">
+        {/* Controls Panel */}
+        <div className="flex items-center gap-16 relative">
+          {/* Joystick Area */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-black/50 rounded-full blur-md transform -translate-y-1"></div>
+            <div className="relative w-20 h-20 bg-black rounded-full border-4 border-gray-800 flex items-center justify-center">
+              <div 
+                className={`w-16 h-16 bg-gradient-to-br from-red-600 to-red-700 rounded-full transform transition-transform duration-150 shadow-lg ${
+                  joystickDirection === 'up' ? '-translate-y-2' :
+                  joystickDirection === 'down' ? 'translate-y-2' :
+                  joystickDirection === 'left' ? '-translate-x-2' :
+                  joystickDirection === 'right' ? 'translate-x-2' : ''
+                }`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
+                <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-1"></div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {/* A/B Buttons */}
-        <div className="flex gap-4">
-          <button 
-            className={`w-8 h-8 rounded-full ${
-              activeButton === 'a' 
-                ? 'bg-arcade-pink shadow-[0_0_15px_#ff00ff]' 
-                : 'bg-arcade-pink/50'
-            } transition-all duration-150`}
-          >
-            A
-          </button>
-          <button 
-            className={`w-8 h-8 rounded-full ${
-              activeButton === 'b' 
-                ? 'bg-arcade-cyan shadow-[0_0_15px_#00ffff]' 
-                : 'bg-arcade-cyan/50'
-            } transition-all duration-150`}
-          >
-            B
-          </button>
+          {/* Buttons Area */}
+          <div className="grid grid-cols-2 gap-4 transform">
+            {/* Row 1 */}
+            <button 
+              className={`w-12 h-12 rounded-full relative group ${
+                activeButton === 'a' 
+                  ? 'bg-red-500 shadow-[0_0_15px_#ef4444]' 
+                  : 'bg-red-500/80'
+              } transition-all duration-150`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
+              <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
+            </button>
+            <button 
+              className={`w-12 h-12 rounded-full relative group ${
+                activeButton === 'b' 
+                  ? 'bg-blue-500 shadow-[0_0_15px_#3b82f6]' 
+                  : 'bg-blue-500/80'
+              } transition-all duration-150`}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
+              <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
+            </button>
+            {/* Row 2 */}
+            <button 
+              className="w-12 h-12 rounded-full relative group bg-yellow-500/80 transition-all duration-150"
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
+              <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
+            </button>
+            <button 
+              className="w-12 h-12 rounded-full relative group bg-green-500/80 transition-all duration-150"
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
+              <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
