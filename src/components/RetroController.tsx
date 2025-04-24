@@ -58,23 +58,30 @@ const RetroController = () => {
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-      <div className="bg-arcade-darkPurple/90 border-2 border-arcade-purple/50 rounded-xl p-8 backdrop-blur-sm transform perspective-1000 rotate-x-12">
+      <div className="bg-arcade-darkPurple/90 border-2 border-arcade-purple/50 rounded-xl p-8 backdrop-blur-sm transform perspective-1000 rotate-x-25">
         {/* Controls Panel */}
         <div className="flex items-center gap-16 relative">
           {/* Joystick Area */}
           <div className="relative">
             <div className="absolute inset-0 bg-black/50 rounded-full blur-md transform -translate-y-1"></div>
-            <div className="relative w-20 h-20 bg-black rounded-full border-4 border-gray-800 flex items-center justify-center">
+            <div className="relative w-20 h-20 bg-black rounded-full border-4 border-gray-800 flex items-center justify-center overflow-visible">
+              {/* Joystick Base */}
+              <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-black rounded-full"></div>
+              {/* Joystick Stem */}
+              <div className="absolute w-8 h-12 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+              {/* Joystick Head */}
               <div 
-                className={`w-16 h-16 bg-gradient-to-br from-red-600 to-red-700 rounded-full transform transition-transform duration-150 shadow-lg ${
-                  joystickDirection === 'up' ? '-translate-y-2' :
-                  joystickDirection === 'down' ? 'translate-y-2' :
-                  joystickDirection === 'left' ? '-translate-x-2' :
-                  joystickDirection === 'right' ? 'translate-x-2' : ''
+                className={`absolute w-16 h-16 -translate-y-4 bg-gradient-to-br from-red-600 to-red-700 rounded-full transform transition-transform duration-150 shadow-lg ${
+                  joystickDirection === 'up' ? '-translate-y-6' :
+                  joystickDirection === 'down' ? '-translate-y-2' :
+                  joystickDirection === 'left' ? 'translate-x-2 -translate-y-4 rotate-12' :
+                  joystickDirection === 'right' ? '-translate-x-2 -translate-y-4 -rotate-12' : ''
                 }`}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
-                <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-1"></div>
+                <div className="absolute inset-0 bg-black/20 rounded-full transform"></div>
+                {/* Top highlight */}
+                <div className="absolute w-8 h-8 rounded-full bg-white/20 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
               </div>
             </div>
           </div>
@@ -83,7 +90,7 @@ const RetroController = () => {
           <div className="grid grid-cols-2 gap-4 transform">
             {/* Row 1 */}
             <button 
-              className={`w-12 h-12 rounded-full relative group ${
+              className={`w-12 h-12 rounded-full relative group transform hover:translate-y-0.5 active:translate-y-1 ${
                 activeButton === 'a' 
                   ? 'bg-red-500 shadow-[0_0_15px_#ef4444]' 
                   : 'bg-red-500/80'
@@ -93,7 +100,7 @@ const RetroController = () => {
               <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
             </button>
             <button 
-              className={`w-12 h-12 rounded-full relative group ${
+              className={`w-12 h-12 rounded-full relative group transform hover:translate-y-0.5 active:translate-y-1 ${
                 activeButton === 'b' 
                   ? 'bg-blue-500 shadow-[0_0_15px_#3b82f6]' 
                   : 'bg-blue-500/80'
@@ -104,13 +111,13 @@ const RetroController = () => {
             </button>
             {/* Row 2 */}
             <button 
-              className="w-12 h-12 rounded-full relative group bg-yellow-500/80 transition-all duration-150"
+              className="w-12 h-12 rounded-full relative group transform hover:translate-y-0.5 active:translate-y-1 bg-yellow-500/80 transition-all duration-150"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
               <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
             </button>
             <button 
-              className="w-12 h-12 rounded-full relative group bg-green-500/80 transition-all duration-150"
+              className="w-12 h-12 rounded-full relative group transform hover:translate-y-0.5 active:translate-y-1 bg-green-500/80 transition-all duration-150"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
               <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
