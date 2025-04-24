@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Gamepad, Headphones, Disc, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -6,6 +5,7 @@ import SkillsSection from './SkillsSection';
 import ExperienceSection from './ExperienceSection';
 import ProjectsSection from './ProjectsSection';
 import ContactSection from './ContactSection';
+import RetroController from './RetroController';
 
 const ArcadeScreen = () => {
   const [loaded, setLoaded] = useState(false);
@@ -152,6 +152,9 @@ const ArcadeScreen = () => {
       {/* Ambient corners lighting */}
       <div className="fixed top-0 left-0 w-64 h-64 bg-arcade-pink/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="fixed bottom-0 right-0 w-64 h-64 bg-arcade-cyan/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      {/* Add RetroController */}
+      <RetroController />
     </div>
   );
 };
