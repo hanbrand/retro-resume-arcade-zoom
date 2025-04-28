@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Gamepad, Headphones, Disc, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -42,8 +43,8 @@ const ArcadeScreen = () => {
           <>
             {/* Header */}
             <div className="mb-8 text-center">
-              <h1 className="text-2xl md:text-4xl font-press-start neon-text mb-2">RESUME ARCADE</h1>
-              <p className="text-sm md:text-base font-vt323 text-arcade-cyan">PLAYER 1 - READY</p>
+              <h1 className="text-2xl md:text-4xl font-press-start neon-text mb-2">BRANDON HAN</h1>
+              <p className="text-sm md:text-base font-vt323 text-arcade-cyan">RESEARCH LAB MANAGER & ASPIRING ML ENGINEER</p>
             </div>
 
             {/* Main content */}
@@ -89,9 +90,9 @@ const ArcadeScreen = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="md:col-span-1 flex justify-center">
                         <div className="w-48 h-48 border-4 border-arcade-neonPink relative overflow-hidden">
-                          {/* Placeholder for profile image - pixelated avatar */}
+                          {/* Profile avatar with arcade style */}
                           <div className="w-full h-full bg-gradient-to-br from-arcade-purple to-arcade-pink flex items-center justify-center">
-                            <div className="text-6xl font-press-start text-white">?</div>
+                            <div className="text-6xl font-press-start text-white">BH</div>
                           </div>
                           
                           {/* Scanline effect */}
@@ -101,28 +102,29 @@ const ArcadeScreen = () => {
                       
                       <div className="md:col-span-2 space-y-4">
                         <p className="text-xl">
-                          Welcome to my interactive resume! I'm a passionate developer with a love for creating amazing digital experiences.
+                          Research Lab Manager with 4+ years experience at UCLA, transitioning into an ML Engineering career after completing my Master's in Computer Science.
                         </p>
                         
                         <p>
-                          This portfolio showcases my skills and experience through a retro arcade interface. Navigate through the different sections using the tabs above or the arcade controls.
+                          I specialize in building AI-powered data processing systems and have developed numerous web applications and ML models to solve complex problems in healthcare and research.
                         </p>
                         
                         <div className="bg-arcade-darkPurple/50 border border-arcade-cyan/30 p-4 rounded-md">
                           <h3 className="text-arcade-cyan font-press-start text-sm mb-2">PLAYER STATS</h3>
                           <ul className="list-disc list-inside space-y-1">
-                            <li>Full-stack Developer with 5+ years experience</li>
-                            <li>Specialized in React, TypeScript, and Node.js</li>
-                            <li>Passionate about creative UI/UX design</li>
-                            <li>Constantly learning new technologies</li>
+                            <li>Expertise in Python, ML/DS Libraries, and Web Development</li>
+                            <li>Secured $1.2M+ in funding for AI infrastructure development</li>
+                            <li>Managed 120+ lab members and clients across multiple projects</li>
+                            <li>Implemented AI-powered pipelines for data processing and analysis</li>
+                            <li>Currently pursuing MS in Computer Science at USC (Expected Dec 2025)</li>
                           </ul>
                         </div>
                       </div>
                     </div>
                     
                     <div className="mt-8 p-4 border border-arcade-purple/30 rounded-md bg-gradient-to-r from-arcade-darkPurple to-black">
-                      <h3 className="text-arcade-purple font-press-start text-sm mb-2">CHEAT CODE</h3>
-                      <p>Press the tab buttons above to navigate through my resume or use the arrow keys for a true arcade experience!</p>
+                      <h3 className="text-arcade-purple font-press-start text-sm mb-2">GAME CONTROLS</h3>
+                      <p>Use the controller at the bottom of the screen or keyboard arrow keys to navigate through my resume. Press 'A' to select or 'B' to go back.</p>
                     </div>
                   </div>
                 </TabsContent>
@@ -143,7 +145,7 @@ const ArcadeScreen = () => {
 
             {/* Footer */}
             <div className="mt-8 text-center text-arcade-cyan font-vt323">
-              <p className="animate-pulse">&copy; 2025 RESUME ARCADE - INSERT COIN TO CONTINUE</p>
+              <p className="animate-pulse">&copy; 2025 BRANDON HAN - RESUME ARCADE - INSERT COIN TO CONTINUE</p>
             </div>
           </>
         )}

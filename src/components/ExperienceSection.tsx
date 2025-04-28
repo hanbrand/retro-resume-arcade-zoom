@@ -6,37 +6,44 @@ const ExperienceSection = () => {
   
   const experiences = [
     {
-      title: "Senior Frontend Developer",
-      company: "TechCorp Inc.",
-      period: "2022 - Present",
-      description: "Led the development of a complex web application using React, TypeScript, and Tailwind CSS. Improved performance by 40% through code optimization and modern build techniques.",
+      title: "Research Laboratory Manager",
+      company: "University of California, Los Angeles",
+      period: "January 2019 - December 2023",
+      description: "Led development of automated data processing systems for over 300 screening assays, collaborating closely with 70+ clients to develop and implement robotics and high volume liquid handlers.",
       achievements: [
-        "Implemented CI/CD pipeline using GitHub Actions",
-        "Reduced bundle size by 30% through code splitting and lazy loading",
-        "Mentored junior developers and conducted code reviews"
+        "Developed modular pipelines for feature extraction using AI-based quality scoring; integrated risk detection and model evaluation in safety-critical workflows",
+        "Secured $1.2M+ in funding to build scalable AI infrastructure, enabling safe, high-throughput inference pipelines with reliability and performance optimizations",
+        "Trained and mentored 120+ lab members and clients in advanced data collection using AI-assisted programs and motorized high volume liquid handlers",
+        "Created and optimized an antibody Covid test for over 2,000 patient samples used in early pandemic treatment",
+        "Ran weekly workshops that up-skilled researchers on data visualization and end-to-end pipelines"
       ]
     },
     {
-      title: "Full-Stack Developer",
-      company: "Digital Solutions Ltd",
-      period: "2019 - 2022",
-      description: "Worked on various client projects using React, Node.js, and MongoDB. Developed and maintained RESTful APIs for multiple client applications.",
+      title: "Workforce Development Program Manager",
+      company: "COPE Health Solutions",
+      period: "January 2016 - December 2019",
+      description: "Coordinated and trained 200 volunteers in onboarding and learning essential patient-care skills.",
       achievements: [
-        "Built a real-time chat application with WebSockets",
-        "Integrated third-party payment gateways",
-        "Implemented complex state management solutions using Redux"
+        "Partnered with nursing leadership to streamline onboarding paperwork, shaving 48 hrs off of average onboarding time"
       ]
+    }
+  ];
+  
+  const education = [
+    {
+      degree: "Master of Science, Computer Science",
+      institution: "University of Southern California",
+      location: "Los Angeles, CA",
+      period: "Expected December 2025",
+      gpa: "3.8/4.0",
+      courses: "Advanced Databases, Algorithms, Machine Learning, Deep Learning & Optimization, Web Technologies"
     },
     {
-      title: "Junior Developer",
-      company: "StartUp Innovations",
-      period: "2017 - 2019",
-      description: "Started as an intern and quickly progressed to a full-time role. Worked on front-end development using HTML, CSS, and JavaScript.",
-      achievements: [
-        "Contributed to the company's design system",
-        "Developed responsive email templates",
-        "Created interactive data visualizations using D3.js"
-      ]
+      degree: "Bachelor of Science, Biochemistry",
+      institution: "University of California, Los Angeles",
+      location: "Los Angeles, CA",
+      period: "January 2017 - December 2019",
+      gpa: "3.6/4.0"
     }
   ];
 
@@ -86,31 +93,64 @@ const ExperienceSection = () => {
       
       <div className="mt-8 bg-gradient-to-r from-black to-arcade-darkPurple p-4 rounded-md border border-arcade-orange/30">
         <h3 className="font-press-start text-sm text-arcade-orange mb-2">EDUCATION</h3>
-        <div className="space-y-3">
-          <div className="flex flex-col sm:flex-row justify-between">
-            <div>
-              <h4 className="text-lg">Bachelor of Computer Science</h4>
-              <p>University of Technology</p>
+        <div className="space-y-6">
+          {education.map((edu, index) => (
+            <div key={index} className="pb-4 border-b border-arcade-purple/30 last:border-0">
+              <div className="flex flex-col sm:flex-row justify-between">
+                <div>
+                  <h4 className="text-lg">{edu.degree}</h4>
+                  <p>{edu.institution}</p>
+                  <p className="text-arcade-cyan/80">{edu.location}</p>
+                  {edu.gpa && <p className="text-sm text-arcade-neonPink">GPA: {edu.gpa}</p>}
+                </div>
+                <div className="mt-2 sm:mt-0 text-arcade-cyan">{edu.period}</div>
+              </div>
+              
+              {edu.courses && (
+                <div className="mt-3">
+                  <p className="text-sm text-arcade-neonPink">Relevant Courses:</p>
+                  <p className="text-sm">{edu.courses}</p>
+                </div>
+              )}
             </div>
-            <div className="mt-1 sm:mt-0 text-arcade-cyan">2013 - 2017</div>
-          </div>
+          ))}
+        </div>
           
-          <div>
-            <h4 className="font-press-start text-xs text-arcade-neonPink mt-4 mb-2">CERTIFICATIONS</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div className="px-3 py-2 border border-arcade-purple/40 rounded bg-black/20">
-                AWS Certified Developer
-              </div>
-              <div className="px-3 py-2 border border-arcade-purple/40 rounded bg-black/20">
-                React Advanced Patterns
-              </div>
-              <div className="px-3 py-2 border border-arcade-purple/40 rounded bg-black/20">
-                TypeScript Professional
-              </div>
-              <div className="px-3 py-2 border border-arcade-purple/40 rounded bg-black/20">
-                UI/UX Design Fundamentals
-              </div>
+        <div>
+          <h4 className="font-press-start text-xs text-arcade-neonPink mt-4 mb-2">CERTIFICATIONS</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="px-3 py-2 border border-arcade-purple/40 rounded bg-black/20">
+              AWS Certified Developer
             </div>
+            <div className="px-3 py-2 border border-arcade-purple/40 rounded bg-black/20">
+              Machine Learning Specialization
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mt-8 border-2 border-arcade-pink/20 p-4 rounded-md bg-black/30">
+        <h3 className="font-press-start text-sm text-arcade-cyan mb-2">CONTACT INFO</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-arcade-neonPink">📍</span>
+            <span>Los Angeles, CA</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-arcade-neonPink">📱</span>
+            <span>626-404-4082</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-arcade-neonPink">📧</span>
+            <span>brandonh4n@gmail.com</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-arcade-neonPink">🌐</span>
+            <span>linkedin.com/in/brandon-han-63b061239/</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-arcade-neonPink">💻</span>
+            <span>github.com/hanbrand</span>
           </div>
         </div>
       </div>

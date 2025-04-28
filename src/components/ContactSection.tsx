@@ -77,21 +77,34 @@ const ContactSection = () => {
                   <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
                     <span className="text-xl">📧</span>
                   </div>
-                  <span>email@example.com</span>
+                  <span>brandonh4n@gmail.com</span>
                 </div>
                 
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
                     <span className="text-xl">📱</span>
                   </div>
-                  <span>(123) 456-7890</span>
+                  <span>626-404-4082</span>
                 </div>
                 
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
                     <span className="text-xl">🌐</span>
                   </div>
-                  <span>linkedin.com/in/myprofile</span>
+                  <a href="https://www.linkedin.com/in/brandon-han-63b061239/" target="_blank" rel="noopener noreferrer" 
+                     className="hover:text-arcade-cyan transition-colors">
+                    linkedin.com/in/brandon-han-63b061239/
+                  </a>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
+                    <span className="text-xl">💻</span>
+                  </div>
+                  <a href="https://github.com/hanbrand" target="_blank" rel="noopener noreferrer" 
+                     className="hover:text-arcade-cyan transition-colors">
+                    github.com/hanbrand
+                  </a>
                 </div>
               </div>
               
@@ -99,8 +112,8 @@ const ContactSection = () => {
                 <h3 className="font-press-start text-sm text-arcade-neonPink mb-4">LOCATION</h3>
                 
                 <div className="border border-arcade-cyan/30 p-4 rounded-md bg-arcade-darkPurple/50">
-                  <div className="mb-2 text-arcade-cyan">Remote / Worldwide</div>
-                  <p>Available for remote work and collaborations across any time zone.</p>
+                  <div className="mb-2 text-arcade-cyan">Los Angeles, CA</div>
+                  <p>Available for opportunities in Los Angeles and remote positions worldwide.</p>
                 </div>
               </div>
             </div>
@@ -221,16 +234,16 @@ const ContactSection = () => {
         <h3 className="font-press-start text-sm text-arcade-orange mb-2">AVAILABLE FOR</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="px-3 py-2 border border-arcade-purple/40 rounded text-center bg-black/20">
-            Full-time Positions
+            Full-time Roles
           </div>
           <div className="px-3 py-2 border border-arcade-purple/40 rounded text-center bg-black/20">
-            Contract Work
+            ML Engineering
           </div>
           <div className="px-3 py-2 border border-arcade-purple/40 rounded text-center bg-black/20">
-            Freelance Projects
+            Data Science
           </div>
           <div className="px-3 py-2 border border-arcade-purple/40 rounded text-center bg-black/20">
-            Collaborations
+            Research Projects
           </div>
         </div>
       </div>
