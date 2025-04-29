@@ -191,7 +191,7 @@ const ArcadeMachine = ({ onZoomComplete }: ArcadeMachineProps) => {
       )}
       
       {/* Floating particles */}
-      <style jsx="true">{`
+      <style>{`
         @keyframes gridMove {
           0% {
             background-position: 0 0;
