@@ -6,26 +6,25 @@ type Direction = 'up' | 'down' | 'left' | 'right' | 'neutral';
 type Button = 'a' | 'b' | 'x' | 'y' | null;
 
 const RetroController = () => {
-  const [joystickDirection, setJoystickDirection] = useState<Direction>('neutral');
+  const [activeDirection, setActiveDirection] = useState<Direction>('neutral');
   const [activeButton, setActiveButton] = useState<Button>(null);
   const [lastScrollPosition, setLastScrollPosition] = useState(0);
   const [keyPressed, setKeyPressed] = useState<string | null>(null);
-  const [dragActive, setDragActive] = useState(false);
   
   useEffect(() => {
     // Scroll handling
     const handleScroll = () => {
       const currentScroll = window.scrollY;
       if (currentScroll > lastScrollPosition) {
-        setJoystickDirection('down');
+        setActiveDirection('down');
       } else if (currentScroll < lastScrollPosition) {
-        setJoystickDirection('up');
+        setActiveDirection('up');
       }
       setLastScrollPosition(currentScroll);
 
-      // Reset joystick position after a short delay
+      // Reset direction after a short delay
       setTimeout(() => {
-        setJoystickDirection('neutral');
+        setActiveDirection('neutral');
       }, 150);
     };
 
@@ -55,22 +54,22 @@ const RetroController = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
         case 'ArrowUp':
-          setJoystickDirection('up');
+          setActiveDirection('up');
           window.scrollBy(0, -100);
           setKeyPressed('up');
           break;
         case 'ArrowDown':
-          setJoystickDirection('down');
+          setActiveDirection('down');
           window.scrollBy(0, 100);
           setKeyPressed('down');
           break;
         case 'ArrowLeft':
-          setJoystickDirection('left');
+          setActiveDirection('left');
           navigateTabs('prev');
           setKeyPressed('left');
           break;
         case 'ArrowRight':
-          setJoystickDirection('right');
+          setActiveDirection('right');
           navigateTabs('next');
           setKeyPressed('right');
           break;
@@ -90,7 +89,7 @@ const RetroController = () => {
     };
 
     const handleKeyUp = () => {
-      setJoystickDirection('neutral');
+      setActiveDirection('neutral');
       setActiveButton(null);
       setKeyPressed(null);
     };
@@ -143,62 +142,14 @@ const RetroController = () => {
 
   // Function to handle the B button (back/undo) action
   const handleBackAction = () => {
-    // For demonstration, let's make it navigate to the previous tab
+    // For demonstration, navigate to the previous tab
     navigateTabs('prev');
     setTimeout(() => setActiveButton(null), 150);
   };
 
-  // Enhanced joystick interaction with mouse/touch support
-  const handleJoystickMouseDown = (e: React.MouseEvent) => {
-    setDragActive(true);
-    handleJoystickMove(e.clientX, e.clientY);
-  };
-
-  const handleJoystickMouseMove = (e: React.MouseEvent) => {
-    if (dragActive) {
-      handleJoystickMove(e.clientX, e.clientY);
-    }
-  };
-
-  const handleJoystickMouseUp = () => {
-    setDragActive(false);
-    setJoystickDirection('neutral');
-  };
-
-  const handleJoystickMove = (clientX: number, clientY: number) => {
-    const joystickElement = document.getElementById('joystick-head');
-    if (!joystickElement) return;
-
-    const joystickRect = joystickElement.getBoundingClientRect();
-    const centerX = joystickRect.left + joystickRect.width / 2;
-    const centerY = joystickRect.top + joystickRect.height / 2;
-
-    const deltaX = clientX - centerX;
-    const deltaY = clientY - centerY;
-
-    // Determine direction based on larger delta
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      if (deltaX > 10) {
-        setJoystickDirection('right');
-        navigateTabs('next');
-      } else if (deltaX < -10) {
-        setJoystickDirection('left');
-        navigateTabs('prev');
-      }
-    } else {
-      if (deltaY > 10) {
-        setJoystickDirection('down');
-        window.scrollBy(0, 50);
-      } else if (deltaY < -10) {
-        setJoystickDirection('up');
-        window.scrollBy(0, -50);
-      }
-    }
-  };
-
-  // Handle joystick click in different directions
-  const handleJoystickClick = (direction: Direction) => {
-    setJoystickDirection(direction);
+  // Function to handle D-pad button click
+  const handleDPadClick = (direction: Direction) => {
+    setActiveDirection(direction);
     
     switch (direction) {
       case 'up':
@@ -219,7 +170,7 @@ const RetroController = () => {
     
     // Return to neutral position after a short delay
     setTimeout(() => {
-      setJoystickDirection('neutral');
+      setActiveDirection('neutral');
     }, 200);
   };
 
@@ -234,71 +185,55 @@ const RetroController = () => {
         <div className="bg-gradient-to-b from-black/80 to-arcade-darkPurple/90 p-4 rounded-lg border border-white/5 relative">
           {/* Controls Panel */}
           <div className="flex items-center gap-12 md:gap-16 relative">
-            {/* Joystick Area with D-pad indicators */}
+            {/* D-pad Area */}
             <div className="relative">
-              <div className="absolute inset-0 bg-black/50 rounded-full blur-md transform -translate-y-1"></div>
-              <div className="relative w-20 h-20 bg-black rounded-full border-4 border-gray-800 flex items-center justify-center overflow-visible group">
-                {/* Joystick Base */}
-                <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-black rounded-full"></div>
+              <div className="relative w-24 h-24 bg-black border-2 border-gray-800 rounded-lg">
+                {/* D-pad base */}
+                <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-black rounded-lg"></div>
                 
-                {/* D-pad indicators */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-5 text-arcade-cyan opacity-70">
-                  <ArrowUp size={12} className={`${keyPressed === 'up' ? 'text-arcade-cyan' : 'text-white/50'}`} />
-                </div>
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-5 text-arcade-cyan opacity-70">
-                  <ArrowDown size={12} className={`${keyPressed === 'down' ? 'text-arcade-cyan' : 'text-white/50'}`} />
-                </div>
-                <div className="absolute left-0 top-1/2 -translate-x-5 -translate-y-1/2 text-arcade-cyan opacity-70">
-                  <ArrowLeft size={12} className={`${keyPressed === 'left' ? 'text-arcade-cyan' : 'text-white/50'}`} />
-                </div>
-                <div className="absolute right-0 top-1/2 translate-x-5 -translate-y-1/2 text-arcade-cyan opacity-70">
-                  <ArrowRight size={12} className={`${keyPressed === 'right' ? 'text-arcade-cyan' : 'text-white/50'}`} />
-                </div>
-                
-                {/* Joystick Stem */}
-                <div className="absolute w-8 h-12 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-                
-                {/* Interactive Joystick Head */}
-                <div 
-                  id="joystick-head"
-                  className={`absolute w-16 h-16 -translate-y-4 bg-gradient-to-br from-red-600 to-red-700 rounded-full transform transition-transform duration-150 shadow-lg cursor-grab ${dragActive ? 'cursor-grabbing' : ''} ${
-                    joystickDirection === 'up' ? '-translate-y-6' :
-                    joystickDirection === 'down' ? '-translate-y-2' :
-                    joystickDirection === 'left' ? 'translate-x-2 -translate-y-4 rotate-12' :
-                    joystickDirection === 'right' ? '-translate-x-2 -translate-y-4 -rotate-12' : ''
-                  }`}
-                  onMouseDown={handleJoystickMouseDown}
-                  onMouseMove={handleJoystickMouseMove}
-                  onMouseUp={handleJoystickMouseUp}
-                  onMouseLeave={handleJoystickMouseUp}
+                {/* D-pad buttons */}
+                <button 
+                  onClick={() => handleDPadClick('up')}
+                  className={`absolute w-8 h-8 top-0 left-1/2 -translate-x-1/2 -translate-y-1 bg-gray-800 hover:bg-gray-700 rounded-md flex items-center justify-center ${
+                    activeDirection === 'up' || keyPressed === 'up' ? 'shadow-inner bg-gray-700 shadow-arcade-cyan/30' : ''
+                  } transition-colors`}
+                  aria-label="Move up"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
-                  <div className="absolute inset-0 bg-black/20 rounded-full transform"></div>
-                  {/* Top highlight */}
-                  <div className="absolute w-8 h-8 rounded-full bg-white/20 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
-                  
-                  {/* Clickable joystick direction controls */}
-                  <button 
-                    onClick={() => handleJoystickClick('up')} 
-                    className="absolute w-full h-1/2 top-0 left-0 cursor-pointer z-10"
-                    aria-label="Move up"
-                  />
-                  <button 
-                    onClick={() => handleJoystickClick('down')} 
-                    className="absolute w-full h-1/2 bottom-0 left-0 cursor-pointer z-10"
-                    aria-label="Move down"
-                  />
-                  <button 
-                    onClick={() => handleJoystickClick('left')} 
-                    className="absolute w-1/2 h-full top-0 left-0 cursor-pointer z-10"
-                    aria-label="Move left"
-                  />
-                  <button 
-                    onClick={() => handleJoystickClick('right')} 
-                    className="absolute w-1/2 h-full top-0 right-0 cursor-pointer z-10"
-                    aria-label="Move right"
-                  />
-                </div>
+                  <ArrowUp size={14} className={`${keyPressed === 'up' || activeDirection === 'up' ? 'text-arcade-cyan' : 'text-gray-400'}`} />
+                </button>
+                
+                <button 
+                  onClick={() => handleDPadClick('down')}
+                  className={`absolute w-8 h-8 bottom-0 left-1/2 -translate-x-1/2 translate-y-1 bg-gray-800 hover:bg-gray-700 rounded-md flex items-center justify-center ${
+                    activeDirection === 'down' || keyPressed === 'down' ? 'shadow-inner bg-gray-700 shadow-arcade-cyan/30' : ''
+                  } transition-colors`}
+                  aria-label="Move down"
+                >
+                  <ArrowDown size={14} className={`${keyPressed === 'down' || activeDirection === 'down' ? 'text-arcade-cyan' : 'text-gray-400'}`} />
+                </button>
+                
+                <button 
+                  onClick={() => handleDPadClick('left')}
+                  className={`absolute w-8 h-8 left-0 top-1/2 -translate-y-1/2 -translate-x-1 bg-gray-800 hover:bg-gray-700 rounded-md flex items-center justify-center ${
+                    activeDirection === 'left' || keyPressed === 'left' ? 'shadow-inner bg-gray-700 shadow-arcade-cyan/30' : ''
+                  } transition-colors`}
+                  aria-label="Move left"
+                >
+                  <ArrowLeft size={14} className={`${keyPressed === 'left' || activeDirection === 'left' ? 'text-arcade-cyan' : 'text-gray-400'}`} />
+                </button>
+                
+                <button 
+                  onClick={() => handleDPadClick('right')}
+                  className={`absolute w-8 h-8 right-0 top-1/2 -translate-y-1/2 translate-x-1 bg-gray-800 hover:bg-gray-700 rounded-md flex items-center justify-center ${
+                    activeDirection === 'right' || keyPressed === 'right' ? 'shadow-inner bg-gray-700 shadow-arcade-cyan/30' : ''
+                  } transition-colors`}
+                  aria-label="Move right"
+                >
+                  <ArrowRight size={14} className={`${keyPressed === 'right' || activeDirection === 'right' ? 'text-arcade-cyan' : 'text-gray-400'}`} />
+                </button>
+                
+                {/* Center cross */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-black rounded-sm border border-gray-700"></div>
               </div>
               <div className="text-center mt-1 text-xs font-press-start text-arcade-cyan/70">MOVE</div>
             </div>
@@ -367,7 +302,7 @@ const RetroController = () => {
             
           {/* Instructions note */}
           <div className="mt-4 text-center text-xs font-vt323 text-arcade-cyan/60 max-w-[240px] mx-auto">
-            <p>Use arrow keys or joystick to navigate. Press A to select, B to go back.</p>
+            <p>Use arrow keys or D-pad to navigate. Press A to select, B to go back.</p>
           </div>
         </div>
       </div>

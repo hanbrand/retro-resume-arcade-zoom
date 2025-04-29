@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import ArcadeMachine from '@/components/ArcadeMachine';
 import ArcadeScreen from '@/components/ArcadeScreen';
+import RetroController from '@/components/RetroController';
 
 const Index = () => {
   const [showResume, setShowResume] = useState(false);
@@ -15,7 +16,10 @@ const Index = () => {
       {!showResume ? (
         <ArcadeMachine onZoomComplete={handleZoomComplete} />
       ) : (
-        <ArcadeScreen />
+        <>
+          <ArcadeScreen />
+          <RetroController />
+        </>
       )}
     </div>
   );

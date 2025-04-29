@@ -30,23 +30,30 @@ const ArcadeMachine = ({ onZoomComplete }: ArcadeMachineProps) => {
 
   return (
     <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-      {/* Enhanced animated background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-arcade-purple/20 to-arcade-darkPurple">
-        {/* Animated neon grid lines */}
-        <div className="absolute inset-0 opacity-30"
+      {/* Enhanced nebula background */}
+      <div className="absolute inset-0 bg-black overflow-hidden">
+        {/* Base nebula layer with deep purple */}
+        <div 
+          className="absolute inset-0 opacity-90"
           style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(155, 135, 245, 0.5) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(155, 135, 245, 0.5) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px',
-            animation: 'gridMove 15s linear infinite',
+            background: 'radial-gradient(circle at center, rgba(59, 30, 76, 0.8) 0%, rgba(15, 10, 40, 1) 70%)',
           }}
         />
         
-        {/* Animated stars/particles */}
+        {/* Cloudy nebula formations */}
+        <div 
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: 'url(lovable-uploads/e6accaab-a426-4075-8b09-717d87ba5bfb.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            mixBlendMode: 'screen',
+          }}
+        />
+        
+        {/* Animated star field */}
         <div className="absolute inset-0 overflow-hidden">
-          {Array.from({ length: 40 }).map((_, i) => (
+          {Array.from({ length: 150 }).map((_, i) => (
             <div
               key={i}
               className="absolute rounded-full bg-white"
@@ -62,29 +69,29 @@ const ArcadeMachine = ({ onZoomComplete }: ArcadeMachineProps) => {
           ))}
         </div>
 
-        {/* Sun/planet in the background */}
-        <div className="absolute top-20 right-20 w-64 h-64 rounded-full bg-gradient-to-br from-arcade-orange to-arcade-neonPink opacity-30 blur-2xl" />
-        <div className="absolute bottom-10 left-20 w-40 h-40 rounded-full bg-gradient-to-br from-arcade-cyan to-arcade-purple opacity-20 blur-xl" />
+        {/* Cosmic dust layers */}
+        <div className="absolute top-1/4 right-1/4 w-[500px] h-[400px] rounded-full bg-gradient-to-r from-arcade-pink/20 to-arcade-purple/30 blur-[100px] animate-float" />
+        <div className="absolute bottom-1/4 left-1/3 w-[600px] h-[400px] rounded-full bg-gradient-to-r from-arcade-cyan/20 to-arcade-neonBlue/20 blur-[120px] animate-float" style={{ animationDelay: '-1.5s' }} />
+        <div className="absolute top-1/3 left-1/4 w-[400px] h-[300px] rounded-full bg-gradient-to-r from-arcade-orange/20 to-red-500/20 blur-[100px] animate-float" style={{ animationDelay: '-2s' }} />
         
-        {/* Floor grid with perspective */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/3">
-          <div className="h-full w-full" style={{
-            backgroundImage: 'linear-gradient(to right, rgba(155, 135, 245, 0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(155, 135, 245, 0.4) 1px, transparent 1px)',
-            backgroundSize: '50px 50px',
-            transform: 'perspective(500px) rotateX(60deg)',
-            transformOrigin: 'bottom',
-            animation: 'gridPulse 5s infinite alternate',
+        {/* Galactic core glow */}
+        <div className="absolute top-[45%] left-[55%] -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-white blur-[100px] opacity-20" />
+        
+        {/* Animated nebula rays */}
+        <div className="absolute top-0 left-0 right-0 h-full">
+          <div className="h-full w-full opacity-30" style={{
+            background: 'linear-gradient(135deg, transparent 0%, rgba(236, 72, 153, 0.1) 50%, transparent 100%)',
+            animation: 'nebula-ray 15s linear infinite alternate',
+          }} />
+        </div>
+        <div className="absolute top-0 left-0 right-0 h-full">
+          <div className="h-full w-full opacity-30" style={{
+            background: 'linear-gradient(225deg, transparent 0%, rgba(34, 211, 238, 0.1) 50%, transparent 100%)',
+            animation: 'nebula-ray 12s linear infinite alternate-reverse',
           }} />
         </div>
         
-        {/* Animated neon mountains/shapes in the distance */}
-        <div className="absolute bottom-[33%] left-0 right-0 h-20 bg-arcade-darkPurple" style={{
-          clipPath: 'polygon(0% 100%, 5% 80%, 10% 90%, 15% 70%, 20% 85%, 25% 75%, 30% 90%, 35% 70%, 40% 80%, 45% 65%, 50% 80%, 55% 70%, 60% 90%, 65% 80%, 70% 85%, 75% 65%, 80% 75%, 85% 90%, 90% 75%, 95% 85%, 100% 65%, 100% 100%)',
-        }}>
-          <div className="absolute inset-0 bg-gradient-to-t from-arcade-purple/0 to-arcade-neonPink/30" />
-        </div>
-
-        {/* Side arcade machines (decorative and more vibrant) */}
+        {/* Side arcade machines (decorative) */}
         <div className="absolute left-8 bottom-32 w-40 h-72 bg-gradient-to-b from-arcade-pink to-arcade-darkPurple rounded-t-lg border border-arcade-neonPink">
           <div className="absolute top-5 left-5 right-5 h-24 bg-black/70 border border-arcade-cyan/50"></div>
           <div className="absolute top-36 left-1/2 -translate-x-1/2 w-24 h-6 bg-arcade-darkPurple grid grid-cols-3 gap-1 p-1">
@@ -150,10 +157,10 @@ const ArcadeMachine = ({ onZoomComplete }: ArcadeMachineProps) => {
           {/* Controls with enhanced styling */}
           <div className="absolute bottom-20 left-0 right-0 h-24 flex items-center justify-center">
             <div className="flex gap-8">
-              {/* Joystick */}
+              {/* D-pad */}
               <div className="w-16 h-16 relative">
-                <div className="absolute w-12 h-12 bg-black rounded-full border-2 border-arcade-neonPink/50 shadow-[0_0_5px_rgba(236,72,153,0.5)]"></div>
-                <div className="absolute top-2 left-2 w-8 h-8 bg-gradient-to-br from-arcade-pink to-red-600 rounded-full shadow-lg"></div>
+                <div className="absolute w-12 h-12 bg-black rounded-lg border-2 border-arcade-neonPink/50 shadow-[0_0_5px_rgba(236,72,153,0.5)]"></div>
+                <div className="absolute top-2 left-2 w-8 h-8 bg-gradient-to-br from-gray-700 to-gray-900 rounded-sm shadow-md"></div>
               </div>
               
               {/* Buttons */}
@@ -190,8 +197,9 @@ const ArcadeMachine = ({ onZoomComplete }: ArcadeMachineProps) => {
         </div>
       )}
       
-      {/* Floating particles */}
-      <style>{`
+      {/* Nebula and CRT animations */}
+      <style>
+        {`
         @keyframes gridMove {
           0% {
             background-position: 0 0;
@@ -212,12 +220,23 @@ const ArcadeMachine = ({ onZoomComplete }: ArcadeMachineProps) => {
           }
         }
         
-        @keyframes gridPulse {
+        @keyframes nebula-ray {
           0% {
-            opacity: 0.5;
+            opacity: 0.1;
+            transform: rotate(0deg) scale(1);
           }
           100% {
-            opacity: 0.8;
+            opacity: 0.4;
+            transform: rotate(5deg) scale(1.1);
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) translateX(0);
+          }
+          50% {
+            transform: translateY(-20px) translateX(15px);
           }
         }
         
@@ -274,7 +293,8 @@ const ArcadeMachine = ({ onZoomComplete }: ArcadeMachineProps) => {
             opacity: 1;
           }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
