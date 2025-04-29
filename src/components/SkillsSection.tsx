@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { Progress } from "@/components/ui/progress";
 
 const SkillsSection = () => {
   const [loadedSkills, setLoadedSkills] = useState<string[]>([]);
