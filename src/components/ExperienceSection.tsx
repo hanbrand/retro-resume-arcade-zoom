@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 const ExperienceSection = () => {
   const [activeItem, setActiveItem] = useState<number | null>(null);
+  const [activePublicationSection, setActivePublicationSection] = useState<boolean>(false);
   
   const experiences = [
     {
@@ -44,6 +45,44 @@ const ExperienceSection = () => {
       location: "Los Angeles, CA",
       period: "January 2017 - December 2019",
       gpa: "3.6/4.0"
+    }
+  ];
+
+  const publications = [
+    {
+      authors: "Ahn, T. S., Han, B., et al.",
+      date: "December 2020",
+      title: "Commercial immunoglobulin products contain cross-reactive but not neutralizing antibodies against SARS-CoV-2.",
+      journal: "Journal of Allergy and Clinical Immunology",
+      url: "https://www.jacionline.org/article/S0091-6749(20)31765-6/fulltext"
+    },
+    {
+      authors: "Garcia, G., Han, B., et al.",
+      date: "March 2021",
+      title: "Antiviral drug screen identifies DNA-damage response inhibitor as potent blocker of SARS-CoV-2 replication.",
+      journal: "Cell Reports",
+      url: "https://www.cell.com/cell-reports/fulltext/S2211-1247(21)00254-0"
+    },
+    {
+      authors: "Sen, C., Han, B., et al.",
+      date: "May 2024",
+      title: "High Throughput Screening with a Primary Human Mucociliary Airway Model Identifies a Small Molecule with Anti-SARS-CoV-2 Activity.",
+      journal: "RSC Chemical Biology",
+      url: "https://www.biorxiv.org/content/10.1101/2024.05.09.593388v1"
+    },
+    {
+      authors: "Castellón, J. O., Yuen, C., Han, B., et al.",
+      date: "December 2024",
+      title: "An activation-based high throughput screen identifies caspase-10 inhibitors.",
+      journal: "RSC Chemical Biology",
+      url: "https://www.biorxiv.org/content/10.1101/2024.12.15.625925v1"
+    },
+    {
+      authors: "Sen, C., Han, B., et al.",
+      date: "January 2025",
+      title: "Optimization of a micro-scale air-liquid-interface model of human proximal airway epithelium for moderate throughput drug screening for SARS-CoV-2.",
+      journal: "Respiratory Research",
+      url: "https://respiratory-research.biomedcentral.com/articles/10.1186/s12931-025-03095-y"
     }
   ];
 
@@ -129,30 +168,40 @@ const ExperienceSection = () => {
         </div>
       </div>
       
-      <div className="mt-8 border-2 border-arcade-pink/20 p-4 rounded-md bg-black/30">
-        <h3 className="font-press-start text-sm text-arcade-cyan mb-2">CONTACT INFO</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-arcade-neonPink">📍</span>
-            <span>Los Angeles, CA</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-arcade-neonPink">📱</span>
-            <span>626-404-4082</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-arcade-neonPink">📧</span>
-            <span>brandonh4n@gmail.com</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-arcade-neonPink">🌐</span>
-            <span>linkedin.com/in/brandon-han-63b061239/</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-arcade-neonPink">💻</span>
-            <span>github.com/hanbrand</span>
+      {/* Publications Section */}
+      <div className="mt-8 border-2 border-arcade-purple/30 p-4 rounded-md bg-black/40">
+        <div 
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => setActivePublicationSection(!activePublicationSection)}
+        >
+          <h3 className="font-press-start text-sm text-arcade-neonPink">PUBLICATIONS</h3>
+          <div className="px-2 py-1 rounded bg-arcade-darkPurple/70 text-xs">
+            {activePublicationSection ? "[ - ]" : "[ + ]"}
           </div>
         </div>
+        
+        {activePublicationSection && (
+          <div className="mt-4 space-y-6 animate-fade-in">
+            {publications.map((pub, index) => (
+              <div 
+                key={index} 
+                className="p-3 border border-arcade-purple/20 rounded-md bg-gradient-to-r from-black/60 to-arcade-darkPurple/40"
+              >
+                <p className="text-arcade-orange">{pub.authors} ({pub.date})</p>
+                <p className="mt-1 font-bold">{pub.title}</p>
+                <p className="text-arcade-cyan italic">{pub.journal}</p>
+                <a 
+                  href={pub.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="mt-1 text-sm text-arcade-neonPink underline inline-block hover:text-white transition-colors"
+                >
+                  View Publication
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

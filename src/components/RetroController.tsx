@@ -10,6 +10,7 @@ const RetroController = () => {
   const [activeButton, setActiveButton] = useState<Button>(null);
   const [lastScrollPosition, setLastScrollPosition] = useState(0);
   const [keyPressed, setKeyPressed] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState(false);
   
   useEffect(() => {
     // Scroll handling
@@ -147,6 +148,54 @@ const RetroController = () => {
     setTimeout(() => setActiveButton(null), 150);
   };
 
+  // Enhanced joystick interaction with mouse/touch support
+  const handleJoystickMouseDown = (e: React.MouseEvent) => {
+    setDragActive(true);
+    handleJoystickMove(e.clientX, e.clientY);
+  };
+
+  const handleJoystickMouseMove = (e: React.MouseEvent) => {
+    if (dragActive) {
+      handleJoystickMove(e.clientX, e.clientY);
+    }
+  };
+
+  const handleJoystickMouseUp = () => {
+    setDragActive(false);
+    setJoystickDirection('neutral');
+  };
+
+  const handleJoystickMove = (clientX: number, clientY: number) => {
+    const joystickElement = document.getElementById('joystick-head');
+    if (!joystickElement) return;
+
+    const joystickRect = joystickElement.getBoundingClientRect();
+    const centerX = joystickRect.left + joystickRect.width / 2;
+    const centerY = joystickRect.top + joystickRect.height / 2;
+
+    const deltaX = clientX - centerX;
+    const deltaY = clientY - centerY;
+
+    // Determine direction based on larger delta
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX > 10) {
+        setJoystickDirection('right');
+        navigateTabs('next');
+      } else if (deltaX < -10) {
+        setJoystickDirection('left');
+        navigateTabs('prev');
+      }
+    } else {
+      if (deltaY > 10) {
+        setJoystickDirection('down');
+        window.scrollBy(0, 50);
+      } else if (deltaY < -10) {
+        setJoystickDirection('up');
+        window.scrollBy(0, -50);
+      }
+    }
+  };
+
   // Handle joystick click in different directions
   const handleJoystickClick = (direction: Direction) => {
     setJoystickDirection(direction);
@@ -209,14 +258,19 @@ const RetroController = () => {
                 {/* Joystick Stem */}
                 <div className="absolute w-8 h-12 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"></div>
                 
-                {/* Joystick Head */}
+                {/* Interactive Joystick Head */}
                 <div 
-                  className={`absolute w-16 h-16 -translate-y-4 bg-gradient-to-br from-red-600 to-red-700 rounded-full transform transition-transform duration-150 shadow-lg cursor-pointer ${
+                  id="joystick-head"
+                  className={`absolute w-16 h-16 -translate-y-4 bg-gradient-to-br from-red-600 to-red-700 rounded-full transform transition-transform duration-150 shadow-lg cursor-grab ${dragActive ? 'cursor-grabbing' : ''} ${
                     joystickDirection === 'up' ? '-translate-y-6' :
                     joystickDirection === 'down' ? '-translate-y-2' :
                     joystickDirection === 'left' ? 'translate-x-2 -translate-y-4 rotate-12' :
                     joystickDirection === 'right' ? '-translate-x-2 -translate-y-4 -rotate-12' : ''
                   }`}
+                  onMouseDown={handleJoystickMouseDown}
+                  onMouseMove={handleJoystickMouseMove}
+                  onMouseUp={handleJoystickMouseUp}
+                  onMouseLeave={handleJoystickMouseUp}
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
                   <div className="absolute inset-0 bg-black/20 rounded-full transform"></div>
