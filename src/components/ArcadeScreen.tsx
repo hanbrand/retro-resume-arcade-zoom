@@ -6,7 +6,7 @@ import SkillsSection from './SkillsSection';
 import ExperienceSection from './ExperienceSection';
 import ProjectsSection from './ProjectsSection';
 import ContactSection from './ContactSection';
-import RetroController from './RetroController';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ArcadeScreen = () => {
   const [loaded, setLoaded] = useState(false);
@@ -89,11 +89,18 @@ const ArcadeScreen = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div className="md:col-span-1 flex justify-center">
-                        <div className="w-48 h-48 border-4 border-arcade-neonPink relative overflow-hidden">
+                        <div className="w-48 h-48 border-4 border-arcade-neonPink relative overflow-hidden rounded-md">
                           {/* Profile avatar with arcade style */}
-                          <div className="w-full h-full bg-gradient-to-br from-arcade-purple to-arcade-pink flex items-center justify-center">
-                            <div className="text-6xl font-press-start text-white">BH</div>
-                          </div>
+                          <Avatar className="w-full h-full">
+                            <AvatarImage 
+                              src="/lovable-uploads/23f92d99-2fa4-436e-b9d8-3c30361d23f6.png" 
+                              alt="Brandon Han" 
+                              className="object-cover w-full h-full"
+                            />
+                            <AvatarFallback className="bg-gradient-to-br from-arcade-purple to-arcade-pink">
+                              <div className="text-6xl font-press-start text-white">BH</div>
+                            </AvatarFallback>
+                          </Avatar>
                           
                           {/* Scanline effect */}
                           <div className="absolute inset-0 scanline pointer-events-none"></div>
@@ -154,9 +161,6 @@ const ArcadeScreen = () => {
       {/* Ambient corners lighting */}
       <div className="fixed top-0 left-0 w-64 h-64 bg-arcade-pink/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="fixed bottom-0 right-0 w-64 h-64 bg-arcade-cyan/20 rounded-full blur-3xl pointer-events-none"></div>
-
-      {/* Add RetroController */}
-      <RetroController />
     </div>
   );
 };

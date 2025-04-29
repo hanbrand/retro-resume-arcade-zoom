@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Undo, Check } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
 type Direction = 'up' | 'down' | 'left' | 'right' | 'neutral';
 type Button = 'a' | 'b' | 'x' | 'y' | null;
@@ -83,6 +83,16 @@ const RetroController = () => {
           setActiveButton('b');
           handleBackAction();
           break;
+        case 'x':
+        case 'X':
+          setActiveButton('x');
+          handleExtraAction();
+          break;
+        case 'y':
+        case 'Y':
+          setActiveButton('y');
+          handleExtraAction();
+          break;
         default:
           break;
       }
@@ -142,8 +152,13 @@ const RetroController = () => {
 
   // Function to handle the B button (back/undo) action
   const handleBackAction = () => {
-    // For demonstration, navigate to the previous tab
     navigateTabs('prev');
+    setTimeout(() => setActiveButton(null), 150);
+  };
+  
+  // Function to handle X/Y button actions
+  const handleExtraAction = () => {
+    // For demonstration purposes, simply resets to neutral state
     setTimeout(() => setActiveButton(null), 150);
   };
 
@@ -176,134 +191,115 @@ const RetroController = () => {
 
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
-      <div className="bg-arcade-darkPurple/90 border-2 border-arcade-purple/50 rounded-xl p-6 backdrop-blur-lg transform perspective-1000 rotate-x-25 shadow-2xl relative overflow-visible">
-        {/* Ambient light effect */}
-        <div className="absolute -inset-4 bg-arcade-pink/20 rounded-full blur-xl -z-10"></div>
-        <div className="absolute -inset-4 bg-arcade-cyan/20 rounded-full blur-xl -z-10 translate-x-12"></div>
-        
-        {/* Controller surface with metallic effect */}
-        <div className="bg-gradient-to-b from-black/80 to-arcade-darkPurple/90 p-4 rounded-lg border border-white/5 relative">
-          {/* Controls Panel */}
-          <div className="flex items-center gap-12 md:gap-16 relative">
-            {/* D-pad Area */}
-            <div className="relative">
-              <div className="relative w-24 h-24 bg-black border-2 border-gray-800 rounded-lg">
-                {/* D-pad base */}
-                <div className="absolute inset-0 bg-gradient-to-b from-gray-800 to-black rounded-lg"></div>
-                
-                {/* D-pad buttons */}
-                <button 
-                  onClick={() => handleDPadClick('up')}
-                  className={`absolute w-8 h-8 top-0 left-1/2 -translate-x-1/2 -translate-y-1 bg-gray-800 hover:bg-gray-700 rounded-md flex items-center justify-center ${
-                    activeDirection === 'up' || keyPressed === 'up' ? 'shadow-inner bg-gray-700 shadow-arcade-cyan/30' : ''
-                  } transition-colors`}
-                  aria-label="Move up"
-                >
-                  <ArrowUp size={14} className={`${keyPressed === 'up' || activeDirection === 'up' ? 'text-arcade-cyan' : 'text-gray-400'}`} />
-                </button>
-                
-                <button 
-                  onClick={() => handleDPadClick('down')}
-                  className={`absolute w-8 h-8 bottom-0 left-1/2 -translate-x-1/2 translate-y-1 bg-gray-800 hover:bg-gray-700 rounded-md flex items-center justify-center ${
-                    activeDirection === 'down' || keyPressed === 'down' ? 'shadow-inner bg-gray-700 shadow-arcade-cyan/30' : ''
-                  } transition-colors`}
-                  aria-label="Move down"
-                >
-                  <ArrowDown size={14} className={`${keyPressed === 'down' || activeDirection === 'down' ? 'text-arcade-cyan' : 'text-gray-400'}`} />
-                </button>
-                
-                <button 
-                  onClick={() => handleDPadClick('left')}
-                  className={`absolute w-8 h-8 left-0 top-1/2 -translate-y-1/2 -translate-x-1 bg-gray-800 hover:bg-gray-700 rounded-md flex items-center justify-center ${
-                    activeDirection === 'left' || keyPressed === 'left' ? 'shadow-inner bg-gray-700 shadow-arcade-cyan/30' : ''
-                  } transition-colors`}
-                  aria-label="Move left"
-                >
-                  <ArrowLeft size={14} className={`${keyPressed === 'left' || activeDirection === 'left' ? 'text-arcade-cyan' : 'text-gray-400'}`} />
-                </button>
-                
-                <button 
-                  onClick={() => handleDPadClick('right')}
-                  className={`absolute w-8 h-8 right-0 top-1/2 -translate-y-1/2 translate-x-1 bg-gray-800 hover:bg-gray-700 rounded-md flex items-center justify-center ${
-                    activeDirection === 'right' || keyPressed === 'right' ? 'shadow-inner bg-gray-700 shadow-arcade-cyan/30' : ''
-                  } transition-colors`}
-                  aria-label="Move right"
-                >
-                  <ArrowRight size={14} className={`${keyPressed === 'right' || activeDirection === 'right' ? 'text-arcade-cyan' : 'text-gray-400'}`} />
-                </button>
-                
-                {/* Center cross */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-black rounded-sm border border-gray-700"></div>
-              </div>
-              <div className="text-center mt-1 text-xs font-press-start text-arcade-cyan/70">MOVE</div>
-            </div>
+      {/* SNES Controller Design */}
+      <div className="relative w-80 h-40 bg-gray-200 rounded-full px-4 shadow-2xl">
+        {/* Controller Body with rounded edges */}
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-100 to-gray-300 rounded-[40px] shadow-inner border border-gray-400"></div>
 
-            {/* Buttons Area */}
-            <div className="grid grid-cols-2 gap-4 transform">
-              {/* A Button - SELECT */}
-              <div className="flex flex-col items-center">
-                <button 
-                  className={`w-12 h-12 rounded-full relative group transform hover:translate-y-0.5 active:translate-y-1 ${
-                    activeButton === 'a' 
-                      ? 'bg-red-500 shadow-[0_0_15px_#ef4444]' 
-                      : 'bg-red-500/80'
-                  } transition-all duration-150`}
-                  onClick={() => {
-                    setActiveButton('a');
-                    handleSelectAction();
-                  }}
-                  aria-label="Select button"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
-                  <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
-                  <Check size={18} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white/60" />
-                </button>
-                <span className="text-xs font-press-start text-white/60 mt-1">SELECT</span>
-              </div>
-              
-              {/* B Button - BACK */}
-              <div className="flex flex-col items-center">
-                <button 
-                  className={`w-12 h-12 rounded-full relative group transform hover:translate-y-0.5 active:translate-y-1 ${
-                    activeButton === 'b' 
-                      ? 'bg-blue-500 shadow-[0_0_15px_#3b82f6]' 
-                      : 'bg-blue-500/80'
-                  } transition-all duration-150`}
-                  onClick={() => {
-                    setActiveButton('b');
-                    handleBackAction();
-                  }}
-                  aria-label="Back button"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
-                  <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
-                  <Undo size={18} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white/60" />
-                </button>
-                <span className="text-xs font-press-start text-white/60 mt-1">BACK</span>
-              </div>
-              
-              {/* Yellow button */}
-              <button 
-                className="w-12 h-12 rounded-full relative group transform hover:translate-y-0.5 active:translate-y-1 bg-yellow-500/80 transition-all duration-150"
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
-                <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
-              </button>
-              
-              {/* Green button */}
-              <button 
-                className="w-12 h-12 rounded-full relative group transform hover:translate-y-0.5 active:translate-y-1 bg-green-500/80 transition-all duration-150"
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 rounded-full"></div>
-                <div className="absolute inset-0 bg-black/20 rounded-full transform translate-y-0.5"></div>
-              </button>
-            </div>
-          </div>
+        {/* Left circular area for D-pad */}
+        <div className="absolute left-6 top-1/2 -translate-y-1/2 w-20 h-20 bg-gray-400 rounded-full flex items-center justify-center">
+          {/* D-pad cross */}
+          <div className="relative w-16 h-16 bg-gray-300 rounded-sm">
+            {/* D-pad border outline */}
+            <div className="absolute inset-0 border-2 border-black rounded-sm"></div>
             
-          {/* Instructions note */}
-          <div className="mt-4 text-center text-xs font-vt323 text-arcade-cyan/60 max-w-[240px] mx-auto">
-            <p>Use arrow keys or D-pad to navigate. Press A to select, B to go back.</p>
+            {/* Up button */}
+            <button 
+              onClick={() => handleDPadClick('up')}
+              className={`absolute w-5 h-5 top-0 left-1/2 -translate-x-1/2 -translate-y-0 flex items-center justify-center ${
+                activeDirection === 'up' || keyPressed === 'up' ? 'text-arcade-cyan' : 'text-gray-600'
+              }`}
+              aria-label="Move up"
+            >
+              <ArrowUp size={14} className={`${keyPressed === 'up' || activeDirection === 'up' ? 'text-black' : 'text-gray-600'}`} />
+            </button>
+            
+            {/* Down button */}
+            <button 
+              onClick={() => handleDPadClick('down')}
+              className={`absolute w-5 h-5 bottom-0 left-1/2 -translate-x-1/2 translate-y-0 flex items-center justify-center ${
+                activeDirection === 'down' || keyPressed === 'down' ? 'text-arcade-cyan' : 'text-gray-600'
+              }`}
+              aria-label="Move down"
+            >
+              <ArrowDown size={14} className={`${keyPressed === 'down' || activeDirection === 'down' ? 'text-black' : 'text-gray-600'}`} />
+            </button>
+            
+            {/* Left button */}
+            <button 
+              onClick={() => handleDPadClick('left')}
+              className={`absolute w-5 h-5 left-0 top-1/2 -translate-y-1/2 -translate-x-0 flex items-center justify-center ${
+                activeDirection === 'left' || keyPressed === 'left' ? 'text-arcade-cyan' : 'text-gray-600'
+              }`}
+              aria-label="Move left"
+            >
+              <ArrowLeft size={14} className={`${keyPressed === 'left' || activeDirection === 'left' ? 'text-black' : 'text-gray-600'}`} />
+            </button>
+            
+            {/* Right button */}
+            <button 
+              onClick={() => handleDPadClick('right')}
+              className={`absolute w-5 h-5 right-0 top-1/2 -translate-y-1/2 translate-x-0 flex items-center justify-center ${
+                activeDirection === 'right' || keyPressed === 'right' ? 'text-arcade-cyan' : 'text-gray-600'
+              }`}
+              aria-label="Move right"
+            >
+              <ArrowRight size={14} className={`${keyPressed === 'right' || activeDirection === 'right' ? 'text-black' : 'text-gray-600'}`} />
+            </button>
+
+            {/* Center circle */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-gray-400 rounded-full"></div>
           </div>
+        </div>
+        
+        {/* Center area with select/start buttons */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+          <div className="w-24 h-8 flex justify-between items-center transform rotate-[-20deg]">
+            <div className="w-10 h-3 bg-gray-600 rounded-md"></div>
+            <div className="w-10 h-3 bg-gray-600 rounded-md"></div>
+          </div>
+          <div className="mt-8 flex justify-center space-x-2">
+            <div className="text-[8px] text-arcade-pink font-press-start">SELECT</div>
+            <div className="text-[8px] text-arcade-pink font-press-start">START</div>
+          </div>
+        </div>
+
+        {/* Right circular area for action buttons */}
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 w-24 h-24 bg-gray-500 rounded-full flex items-center justify-center">
+          <div className="relative w-20 h-20">
+            {/* Y button - Top */}
+            <button 
+              className={`absolute w-8 h-8 rounded-full top-0 left-1/2 -translate-x-1/2 -translate-y-1/4 
+              ${activeButton === 'y' ? 'bg-green-500 border-2 border-gray-800' : 'bg-green-500'}`}
+              onClick={() => { setActiveButton('y'); handleExtraAction(); }}
+            ></button>
+            
+            {/* X button - Left */}
+            <button 
+              className={`absolute w-8 h-8 rounded-full top-1/2 left-0 -translate-y-1/2 -translate-x-1/4 
+              ${activeButton === 'x' ? 'bg-blue-500 border-2 border-gray-800' : 'bg-blue-500'}`}
+              onClick={() => { setActiveButton('x'); handleExtraAction(); }}
+            ></button>
+            
+            {/* B button - Right */}
+            <button 
+              className={`absolute w-8 h-8 rounded-full top-1/2 right-0 -translate-y-1/2 translate-x-1/4 
+              ${activeButton === 'b' ? 'bg-yellow-400 border-2 border-gray-800' : 'bg-yellow-400'}`}
+              onClick={() => { setActiveButton('b'); handleBackAction(); }}
+            ></button>
+            
+            {/* A button - Bottom */}
+            <button 
+              className={`absolute w-8 h-8 rounded-full bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 
+              ${activeButton === 'a' ? 'bg-red-500 border-2 border-gray-800' : 'bg-red-500'}`}
+              onClick={() => { setActiveButton('a'); handleSelectAction(); }}
+            ></button>
+          </div>
+        </div>
+
+        {/* Subtle instruction label at bottom */}
+        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-arcade-pink/80 font-vt323 whitespace-nowrap">
+          Use arrows to navigate | A to select | B to go back
         </div>
       </div>
     </div>
