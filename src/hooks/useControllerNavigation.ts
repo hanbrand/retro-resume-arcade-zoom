@@ -123,11 +123,16 @@ export const useControllerNavigation = () => {
     const tabsList = Array.from(tabs);
     const currentIndex = tabsList.findIndex(tab => tab.getAttribute('data-state') === 'active');
     
+    // If no tab is currently active, activate the first one
     let newIndex;
-    if (direction === 'next') {
-      newIndex = (currentIndex + 1) % tabsList.length;
+    if (currentIndex === -1) {
+      newIndex = direction === 'next' ? 0 : tabsList.length - 1;
     } else {
-      newIndex = (currentIndex - 1 + tabsList.length) % tabsList.length;
+      if (direction === 'next') {
+        newIndex = (currentIndex + 1) % tabsList.length;
+      } else {
+        newIndex = (currentIndex - 1 + tabsList.length) % tabsList.length;
+      }
     }
     
     (tabsList[newIndex] as HTMLElement).click();
@@ -142,6 +147,12 @@ export const useControllerNavigation = () => {
       const focusableElements = activeTabContent.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
       if (focusableElements.length > 0) {
         (focusableElements[0] as HTMLElement).focus();
+      }
+    } else {
+      // If no tab is active, select the first one
+      const firstTab = document.querySelector('[role="tab"]') as HTMLElement;
+      if (firstTab) {
+        firstTab.click();
       }
     }
     

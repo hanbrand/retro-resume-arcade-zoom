@@ -1,5 +1,5 @@
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import ControllerBody from './controller/ControllerBody';
 import { useControllerNavigation } from '@/hooks/useControllerNavigation';
 import { useControllerVisibility } from '@/hooks/useControllerVisibility';
