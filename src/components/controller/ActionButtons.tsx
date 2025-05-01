@@ -14,7 +14,7 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
         {/* Y button - Top - Experience */}
         <button 
           className={`absolute w-8 h-8 rounded-full top-0 left-1/2 -translate-x-1/2 -translate-y-1/4 
-          ${activeButton === 'y' ? 'bg-arcade-cyan border-2 border-gray-800' : 'bg-arcade-cyan'}`}
+          ${activeButton === 'y' ? 'bg-arcade-cyan border-2 border-gray-800' : 'bg-arcade-cyan hover:bg-arcade-cyan/80'}`}
           onClick={() => onButtonClick('y')}
           aria-label="Experience"
         >
@@ -24,7 +24,7 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
         {/* X button - Left - Skills */}
         <button 
           className={`absolute w-8 h-8 rounded-full top-1/2 left-0 -translate-y-1/2 -translate-x-1/4 
-          ${activeButton === 'x' ? 'bg-arcade-pink border-2 border-gray-800' : 'bg-arcade-pink'}`}
+          ${activeButton === 'x' ? 'bg-arcade-pink border-2 border-gray-800' : 'bg-arcade-pink hover:bg-arcade-pink/80'}`}
           onClick={() => onButtonClick('x')}
           aria-label="Skills"
         >
@@ -34,7 +34,7 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
         {/* B button - Right - Contact */}
         <button 
           className={`absolute w-8 h-8 rounded-full top-1/2 right-0 -translate-y-1/2 translate-x-1/4 
-          ${activeButton === 'b' ? 'bg-arcade-orange border-2 border-gray-800' : 'bg-arcade-orange'}`}
+          ${activeButton === 'b' ? 'bg-arcade-orange border-2 border-gray-800' : 'bg-arcade-orange hover:bg-arcade-orange/80'}`}
           onClick={() => onButtonClick('b')}
           aria-label="Contact"
         >
@@ -44,7 +44,7 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
         {/* A button - Bottom - About */}
         <button 
           className={`absolute w-8 h-8 rounded-full bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 
-          ${activeButton === 'a' ? 'bg-arcade-purple border-2 border-gray-800' : 'bg-arcade-purple'}`}
+          ${activeButton === 'a' ? 'bg-arcade-purple border-2 border-gray-800' : 'bg-arcade-purple hover:bg-arcade-purple/80'}`}
           onClick={() => onButtonClick('a')}
           aria-label="About"
         >

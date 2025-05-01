@@ -6,19 +6,8 @@ import { useControllerVisibility } from '@/hooks/useControllerVisibility';
 
 const RetroController = () => {
   const controllerRef = useRef<HTMLDivElement>(null);
-  const { activeDirection, activeButton, keyPressed, handleDPadClick, handleButtonClick, navigateToTabByName } = useControllerNavigation();
+  const { activeDirection, activeButton, keyPressed, handleDPadClick, handleButtonClick } = useControllerNavigation();
   const { isVisible } = useControllerVisibility(controllerRef);
-
-  // Initialize tabs as soon as component mounts
-  useEffect(() => {
-    // Force initial tab selection
-    const timer = setTimeout(() => {
-      // Try to navigate to the "about" tab to ensure initial tab is active
-      navigateToTabByName('about');
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [navigateToTabByName]);
 
   return (
     <div 

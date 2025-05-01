@@ -20,7 +20,7 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         {/* Up button */}
         <button 
           onClick={() => onDirectionClick('up')}
-          className={`absolute w-5 h-5 top-0 left-1/2 -translate-x-1/2 -translate-y-0 flex items-center justify-center ${
+          className={`absolute w-5 h-5 top-0 left-1/2 -translate-x-1/2 -translate-y-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'up' || keyPressed === 'up' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
           aria-label="Move up"
@@ -31,7 +31,7 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         {/* Down button */}
         <button 
           onClick={() => onDirectionClick('down')}
-          className={`absolute w-5 h-5 bottom-0 left-1/2 -translate-x-1/2 translate-y-0 flex items-center justify-center ${
+          className={`absolute w-5 h-5 bottom-0 left-1/2 -translate-x-1/2 translate-y-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'down' || keyPressed === 'down' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
           aria-label="Move down"
@@ -42,7 +42,7 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         {/* Left button */}
         <button 
           onClick={() => onDirectionClick('left')}
-          className={`absolute w-5 h-5 left-0 top-1/2 -translate-y-1/2 -translate-x-0 flex items-center justify-center ${
+          className={`absolute w-5 h-5 left-0 top-1/2 -translate-y-1/2 -translate-x-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'left' || keyPressed === 'left' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
           aria-label="Move left"
@@ -53,7 +53,7 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         {/* Right button */}
         <button 
           onClick={() => onDirectionClick('right')}
-          className={`absolute w-5 h-5 right-0 top-1/2 -translate-y-1/2 translate-x-0 flex items-center justify-center ${
+          className={`absolute w-5 h-5 right-0 top-1/2 -translate-y-1/2 translate-x-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'right' || keyPressed === 'right' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
           aria-label="Move right"
