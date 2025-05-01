@@ -46,9 +46,10 @@ const ControllerBody = ({
       {/* Action Buttons */}
       <ActionButtons activeButton={activeButton} onButtonClick={onButtonClick} />
 
-      {/* Subtle instruction label at bottom */}
-      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-arcade-pink/80 font-vt323 whitespace-nowrap">
-        Use arrows to navigate | A to select | B to go back
+      {/* Instruction label with button mappings */}
+      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-xs text-arcade-pink/80 font-vt323 flex flex-col items-center">
+        <div className="whitespace-nowrap">Left/Right = Navigate | Up/Down = Scroll</div>
+        <div className="whitespace-nowrap mt-1">A = About | B = Contact | X = Skills | Y = Experience</div>
       </div>
     </div>
   );

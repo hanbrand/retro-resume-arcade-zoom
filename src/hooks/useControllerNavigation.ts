@@ -10,6 +10,20 @@ export const useControllerNavigation = () => {
   const [keyPressed, setKeyPressed] = useState<string | null>(null);
   
   useEffect(() => {
+    // Initialize by activating first tab if none is active
+    const initializeTabs = () => {
+      const tabs = document.querySelectorAll('[role="tab"]');
+      if (tabs.length > 0) {
+        const activeTab = document.querySelector('[role="tab"][data-state="active"]');
+        if (!activeTab) {
+          (tabs[0] as HTMLElement).click();
+        }
+      }
+    };
+    
+    // Call once on mount
+    initializeTabs();
+    
     // Scroll handling
     const handleScroll = () => {
       const currentScroll = window.scrollY;
@@ -84,12 +98,12 @@ export const useControllerNavigation = () => {
         case 'x':
         case 'X':
           setActiveButton('x');
-          handleExtraAction();
+          navigateToTabByName('skills');
           break;
         case 'y':
         case 'Y':
           setActiveButton('y');
-          handleExtraAction();
+          navigateToTabByName('experience');
           break;
         default:
           break;
@@ -137,9 +151,27 @@ export const useControllerNavigation = () => {
     
     (tabsList[newIndex] as HTMLElement).click();
   };
+  
+  // Function to navigate to a specific tab by name
+  const navigateToTabByName = (tabName: string) => {
+    const tabs = document.querySelectorAll('[role="tab"]');
+    const tabsList = Array.from(tabs);
+    
+    const targetTab = tabsList.find(tab => {
+      const tabValue = tab.getAttribute('value');
+      return tabValue?.toLowerCase() === tabName.toLowerCase();
+    });
+    
+    if (targetTab) {
+      (targetTab as HTMLElement).click();
+    }
+  };
 
   // Function to handle the A button (select) action
   const handleSelectAction = () => {
+    // Navigate to "about" tab
+    navigateToTabByName('about');
+    
     const activeTab = document.querySelector('[role="tab"][data-state="active"]');
     const activeTabContent = document.querySelector('[role="tabpanel"][data-state="active"]');
     
@@ -161,13 +193,20 @@ export const useControllerNavigation = () => {
 
   // Function to handle the B button (back/undo) action
   const handleBackAction = () => {
-    navigateTabs('prev');
+    // Navigate to "contact" tab
+    navigateToTabByName('contact');
     setTimeout(() => setActiveButton(null), 150);
   };
   
-  // Function to handle X/Y button actions
-  const handleExtraAction = () => {
-    // For demonstration purposes, simply resets to neutral state
+  // Function to handle X button (Skills)
+  const handleXButtonAction = () => {
+    navigateToTabByName('skills');
+    setTimeout(() => setActiveButton(null), 150);
+  };
+  
+  // Function to handle Y button (Experience)
+  const handleYButtonAction = () => {
+    navigateToTabByName('experience');
     setTimeout(() => setActiveButton(null), 150);
   };
 
@@ -210,8 +249,10 @@ export const useControllerNavigation = () => {
         handleBackAction();
         break;
       case 'x':
+        handleXButtonAction();
+        break;
       case 'y':
-        handleExtraAction();
+        handleYButtonAction();
         break;
       default:
         break;
