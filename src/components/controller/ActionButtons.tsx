@@ -1,4 +1,5 @@
 
+import { Gamepad, Headphones, Disc, Clock } from 'lucide-react';
 import { Button } from '@/components/controller/types';
 
 interface ActionButtonsProps {
@@ -15,8 +16,9 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
           className={`absolute w-8 h-8 rounded-full top-0 left-1/2 -translate-x-1/2 -translate-y-1/4 
           ${activeButton === 'y' ? 'bg-arcade-cyan border-2 border-gray-800' : 'bg-arcade-cyan'}`}
           onClick={() => onButtonClick('y')}
+          aria-label="Experience"
         >
-          <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-black">EXP</span>
+          <Clock size={16} className="absolute inset-0 m-auto text-black" />
         </button>
         
         {/* X button - Left - Skills */}
@@ -24,8 +26,9 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
           className={`absolute w-8 h-8 rounded-full top-1/2 left-0 -translate-y-1/2 -translate-x-1/4 
           ${activeButton === 'x' ? 'bg-arcade-pink border-2 border-gray-800' : 'bg-arcade-pink'}`}
           onClick={() => onButtonClick('x')}
+          aria-label="Skills"
         >
-          <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-black">SKL</span>
+          <Disc size={16} className="absolute inset-0 m-auto text-black" />
         </button>
         
         {/* B button - Right - Contact */}
@@ -33,8 +36,9 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
           className={`absolute w-8 h-8 rounded-full top-1/2 right-0 -translate-y-1/2 translate-x-1/4 
           ${activeButton === 'b' ? 'bg-arcade-orange border-2 border-gray-800' : 'bg-arcade-orange'}`}
           onClick={() => onButtonClick('b')}
+          aria-label="Contact"
         >
-          <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-black">CON</span>
+          <Headphones size={16} className="absolute inset-0 m-auto text-black" />
         </button>
         
         {/* A button - Bottom - About */}
@@ -42,8 +46,9 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
           className={`absolute w-8 h-8 rounded-full bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 
           ${activeButton === 'a' ? 'bg-arcade-purple border-2 border-gray-800' : 'bg-arcade-purple'}`}
           onClick={() => onButtonClick('a')}
+          aria-label="About"
         >
-          <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-black">ABT</span>
+          <Gamepad size={16} className="absolute inset-0 m-auto text-black" />
         </button>
       </div>
     </div>

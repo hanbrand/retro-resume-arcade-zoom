@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { Progress } from "@/components/ui/progress";
 
 const SkillsSection = () => {
   const [loadedSkills, setLoadedSkills] = useState<string[]>([]);
@@ -48,22 +47,11 @@ const SkillsSection = () => {
   ];
 
   useEffect(() => {
-    // Gradually reveal skills for animation effect
+    // Immediately load all skills to fix progress bar display
     const allSkills = skillCategories.flatMap(category => 
       category.skills.map(skill => skill.name)
     );
-    
-    let currentIndex = 0;
-    const interval = setInterval(() => {
-      if (currentIndex < allSkills.length) {
-        setLoadedSkills(prev => [...prev, allSkills[currentIndex]]);
-        currentIndex++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 100);
-    
-    return () => clearInterval(interval);
+    setLoadedSkills(allSkills);
   }, []);
 
   return (
@@ -83,9 +71,7 @@ const SkillsSection = () => {
                   <div key={skillIndex} className="relative">
                     <div className="flex justify-between mb-1">
                       <span className="text-lg">{skill.name}</span>
-                      <span className={`${isLoaded ? "opacity-100" : "opacity-0"} transition-opacity duration-500`}>
-                        {skill.level}/100
-                      </span>
+                      <span className="text-lg">{skill.level}/100</span>
                     </div>
                     
                     <div className="w-full h-6 bg-arcade-darkPurple border border-arcade-cyan/50 rounded-sm overflow-hidden">
@@ -96,9 +82,9 @@ const SkillsSection = () => {
                             : skill.level > 70 
                             ? "bg-arcade-purple" 
                             : "bg-arcade-pink"
-                        } transition-all duration-1000 ease-out flex items-center`}
+                        } transition-all duration-500`}
                         style={{ 
-                          width: isLoaded ? `${skill.level}%` : "0%",
+                          width: `${skill.level}%`,
                         }}
                       >
                         {/* Pixelated progress bar */}
@@ -112,8 +98,8 @@ const SkillsSection = () => {
                     </div>
                     
                     {/* Achievement indicators */}
-                    {isLoaded && skill.level >= 90 && (
-                      <div className="absolute -top-2 -right-2 text-xs font-press-start text-arcade-orange animate-pulse">
+                    {skill.level >= 90 && (
+                      <div className="absolute -top-2 -right-2 text-xs font-press-start text-arcade-orange">
                         ★ MASTER ★
                       </div>
                     )}
