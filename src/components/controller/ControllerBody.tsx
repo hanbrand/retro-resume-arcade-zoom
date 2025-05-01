@@ -49,7 +49,7 @@ const ControllerBody = ({
       {/* Instruction label with button mappings */}
       <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-xs text-arcade-pink/80 font-vt323 flex flex-col items-center">
         <div className="whitespace-nowrap">Left/Right = Navigate Tabs | Up/Down = Scroll</div>
-        <div className="whitespace-nowrap mt-1">A = About | B = Contact | X = Skills | Y = Experience</div>
+        <div className="whitespace-nowrap mt-1">Purple = About | Orange = Contact | Pink = Skills | Cyan = Experience</div>
       </div>
     </div>
   );

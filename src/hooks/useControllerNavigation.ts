@@ -8,6 +8,7 @@ export const useControllerNavigation = () => {
   const [activeButton, setActiveButton] = useState<Button>(null);
   const [lastScrollPosition, setLastScrollPosition] = useState(0);
   const [keyPressed, setKeyPressed] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
   
   // Function to get all tabs
   const getAllTabs = useCallback(() => {
@@ -28,7 +29,9 @@ export const useControllerNavigation = () => {
     if (!activeTab && tabs.length > 0) {
       // If no tab is active, activate the first one
       (tabs[0] as HTMLElement).click();
+      return true;
     }
+    return false;
   }, [getAllTabs, getActiveTab]);
   
   // Function to navigate between tabs
@@ -56,22 +59,44 @@ export const useControllerNavigation = () => {
   
   // Function to navigate to a specific tab by name
   const navigateToTabByName = useCallback((tabName: string) => {
+    console.log(`Attempting to navigate to tab: ${tabName}`);
     const tabs = document.querySelectorAll('[role="tab"]');
     const tabsList = Array.from(tabs);
     
     const targetTab = tabsList.find(tab => {
       const tabValue = tab.getAttribute('value');
+      console.log(`Tab value: ${tabValue}, comparing to: ${tabName}`);
       return tabValue?.toLowerCase() === tabName.toLowerCase();
     });
     
     if (targetTab) {
+      console.log(`Found target tab: ${targetTab.getAttribute('value')}`);
       (targetTab as HTMLElement).click();
+    } else {
+      console.log('Target tab not found');
     }
   }, []);
   
+  // Force initial tab selection if not already done
+  useEffect(() => {
+    if (!initialized) {
+      // Small delay to ensure DOM is fully loaded
+      const timer = setTimeout(() => {
+        const tabsInitialized = ensureTabNavigation();
+        if (tabsInitialized || getActiveTab()) {
+          setInitialized(true);
+        }
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [initialized, ensureTabNavigation, getActiveTab]);
+
   useEffect(() => {
     // Initialize tab navigation when component mounts
-    ensureTabNavigation();
+    const initTimer = setTimeout(() => {
+      ensureTabNavigation();
+    }, 100);
     
     // Scroll handling
     const handleScroll = () => {
@@ -111,7 +136,7 @@ export const useControllerNavigation = () => {
       }
     };
 
-    // Keyboard navigation
+    // Global event handler for keyboard navigation
     const handleKeyDown = (e: KeyboardEvent) => {
       // Ensure tabs are set up before handling navigation
       ensureTabNavigation();
@@ -174,6 +199,7 @@ export const useControllerNavigation = () => {
     window.addEventListener('keyup', handleKeyUp);
 
     return () => {
+      clearTimeout(initTimer);
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('click', handleTabClick);
       window.removeEventListener('keydown', handleKeyDown);
@@ -211,13 +237,13 @@ export const useControllerNavigation = () => {
     }, 200);
   };
 
-  // Function to handle action button click
+  // Function to handle action button click - directly navigate to specific tabs
   const handleButtonClick = (button: Button) => {
     // Ensure tabs are set up before handling actions
     ensureTabNavigation();
-    
     setActiveButton(button);
     
+    // Direct navigation to specific tabs based on button
     switch (button) {
       case 'a':
         navigateToTabByName('about');
@@ -246,6 +272,7 @@ export const useControllerNavigation = () => {
     activeButton,
     keyPressed,
     handleDPadClick,
-    handleButtonClick
+    handleButtonClick,
+    navigateToTabByName // Export this function for direct use
   };
 };
