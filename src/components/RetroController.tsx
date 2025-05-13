@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import ControllerBody from './controller/ControllerBody';
 import { useControllerNavigation } from '@/hooks/useControllerNavigation';
 import { useControllerVisibility } from '@/hooks/useControllerVisibility';
@@ -12,20 +12,9 @@ const RetroController = () => {
     activeButton, 
     keyPressed, 
     handleDPadClick, 
-    handleButtonClick,
-    navigateToTabByName 
+    handleButtonClick
   } = useControllerNavigation();
   const { isVisible } = useControllerVisibility(controllerRef);
-
-  // Initialize navigation to "about" tab when component mounts
-  useEffect(() => {
-    console.log('RetroController mounted - initializing navigation');
-    
-    // Force initial tab selection
-    setTimeout(() => {
-      navigateToTabByName('about');
-    }, 500);
-  }, [navigateToTabByName]);
 
   // Enhanced handler for button clicks
   const onButtonClick = (button: Button) => {
