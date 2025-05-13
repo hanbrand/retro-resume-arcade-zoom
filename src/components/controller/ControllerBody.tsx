@@ -1,4 +1,4 @@
-
+import React from 'react';
 import DPad from './DPad';
 import ActionButtons from './ActionButtons';
 import { Direction } from './DPad';

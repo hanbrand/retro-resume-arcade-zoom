@@ -1,4 +1,3 @@
-
 import { Gamepad, Headphones, Disc, Clock } from 'lucide-react';
 import { Button } from '@/components/controller/types';
 

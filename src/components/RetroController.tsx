@@ -1,13 +1,43 @@
-
 import { useRef, useEffect } from 'react';
 import ControllerBody from './controller/ControllerBody';
 import { useControllerNavigation } from '@/hooks/useControllerNavigation';
 import { useControllerVisibility } from '@/hooks/useControllerVisibility';
+import { Direction } from './controller/DPad';
+import { Button } from './controller/types';
 
 const RetroController = () => {
   const controllerRef = useRef<HTMLDivElement>(null);
-  const { activeDirection, activeButton, keyPressed, handleDPadClick, handleButtonClick } = useControllerNavigation();
+  const { 
+    activeDirection, 
+    activeButton, 
+    keyPressed, 
+    handleDPadClick, 
+    handleButtonClick,
+    navigateToTabByName 
+  } = useControllerNavigation();
   const { isVisible } = useControllerVisibility(controllerRef);
+
+  // Initialize navigation to "about" tab when component mounts
+  useEffect(() => {
+    console.log('RetroController mounted - initializing navigation');
+    
+    // Force initial tab selection
+    setTimeout(() => {
+      navigateToTabByName('about');
+    }, 500);
+  }, [navigateToTabByName]);
+
+  // Enhanced handler for button clicks
+  const onButtonClick = (button: Button) => {
+    console.log(`RetroController: Button clicked: ${button}`);
+    handleButtonClick(button);
+  };
+
+  // Enhanced handler for D-pad clicks
+  const onDirectionClick = (direction: Direction) => {
+    console.log(`RetroController: Direction clicked: ${direction}`);
+    handleDPadClick(direction);
+  };
 
   return (
     <div 
@@ -18,8 +48,8 @@ const RetroController = () => {
         activeDirection={activeDirection}
         activeButton={activeButton}
         keyPressed={keyPressed}
-        onDirectionClick={handleDPadClick}
-        onButtonClick={handleButtonClick}
+        onDirectionClick={onDirectionClick}
+        onButtonClick={onButtonClick}
       />
     </div>
   );
