@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Direction } from '@/components/controller/DPad';
 import { Button } from '@/components/controller/types';
 
@@ -7,11 +7,11 @@ export const useControllerNavigation = () => {
   const [activeButton, setActiveButton] = useState<Button>(null);
   const [lastScrollPosition, setLastScrollPosition] = useState(0);
   const [keyPressed, setKeyPressed] = useState<string | null>(null);
-  const [initialized, setInitialized] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const initAttempts = useRef(0);
   
   // Function to get all tabs - searching by actual DOM attributes
   const getAllTabs = useCallback(() => {
-    console.log("Getting all tabs");
     const tabs = document.querySelectorAll('[role="tab"]');
     console.log(`Found ${tabs.length} tabs`);
     return tabs;
@@ -19,7 +19,6 @@ export const useControllerNavigation = () => {
   
   // Function to get the currently active tab
   const getActiveTab = useCallback(() => {
-    console.log("Getting active tab");
     const activeTab = document.querySelector('[role="tab"][data-state="active"]');
     if (activeTab) {
       console.log(`Active tab: ${activeTab.textContent}`);
@@ -29,52 +28,93 @@ export const useControllerNavigation = () => {
     return activeTab;
   }, []);
   
-  // Function to activate a tab by its value attribute
-  const navigateToTabByName = useCallback((tabName: string) => {
-    console.log(`Attempting to navigate to tab: ${tabName}`);
+  // Function to try clicking a specific tab value
+  const clickTabByValue = useCallback((tabValue: string) => {
+    // Handle specific tab values that might have different text
+    const valueMap: Record<string, string[]> = {
+      'about': ['about', 'purple'],
+      'skills': ['skills', 'pink', 'disc'],
+      'experience': ['experience', 'cyan', 'clock'],
+      'contact': ['contact', 'orange', 'headphones']
+    };
     
-    // First try to find the tab based on the tab content's text content
-    const tabs = document.querySelectorAll('[role="tab"]');
+    // Try multiple potential text values for the tab
+    const possibleValues = valueMap[tabValue] || [tabValue];
     
-    // Try to find a tab with text content containing our tab name
-    let targetTab: Element | null = null;
-    tabs.forEach((tab) => {
-      const tabText = tab.textContent?.toLowerCase() || '';
-      if (tabText.includes(tabName.toLowerCase())) {
-        targetTab = tab;
-        console.log(`Found tab by text content: ${tabText}`);
-      }
-    });
+    // Try to find the tab with the attribute value first (most reliable)
+    let targetTab = document.querySelector(`[role="tab"][value="${tabValue}"]`) as HTMLElement;
+    
+    // If not found by attribute, try by text content
+    if (!targetTab) {
+      const allTabs = document.querySelectorAll('[role="tab"]');
+      
+      allTabs.forEach((tab) => {
+        const tabText = tab.textContent?.toLowerCase() || '';
+        const tabClasses = (tab as HTMLElement).className || '';
+        
+        // Check if any of the possible values are in the text or class
+        for (const val of possibleValues) {
+          if (tabText.includes(val.toLowerCase()) || tabClasses.includes(val.toLowerCase())) {
+            targetTab = tab as HTMLElement;
+            break;
+          }
+        }
+      });
+    }
     
     // If we found a tab, click it
     if (targetTab) {
-      console.log(`Clicking tab: ${targetTab.textContent}`);
-      (targetTab as HTMLElement).click();
-      return true;
-    } else {
-      console.log(`Could not find tab with name: ${tabName}`);
-      // If we can't find the tab, try to click the first tab
-      if (tabs.length > 0) {
-        console.log("Falling back to first tab");
-        (tabs[0] as HTMLElement).click();
+      console.log(`Clicking tab with text: ${targetTab.textContent}`);
+      try {
+        targetTab.click();
         return true;
+      } catch (error) {
+        console.error("Error clicking tab:", error);
       }
     }
     
     return false;
   }, []);
   
+  // Function to activate a tab by its value attribute or text content
+  const navigateToTabByName = useCallback((tabName: string) => {
+    console.log(`Attempting to navigate to tab: ${tabName}`);
+    
+    // Try to click the tab by different strategies
+    if (clickTabByValue(tabName)) {
+      return true;
+    }
+    
+    // Fallback approach: try clicking first tab if we couldn't find the target
+    const tabs = getAllTabs();
+    if (tabs.length > 0) {
+      console.log("Falling back to first tab");
+      try {
+        (tabs[0] as HTMLElement).click();
+        return true;
+      } catch (error) {
+        console.error("Error clicking tab:", error);
+      }
+    }
+    
+    return false;
+  }, [clickTabByValue, getAllTabs]);
+  
   // Function to navigate between tabs
   const navigateTabs = useCallback((direction: 'next' | 'prev') => {
     console.log(`Navigating tabs: ${direction}`);
     const tabs = getAllTabs();
     if (tabs.length === 0) {
-      console.log("No tabs found");
+      console.log("No tabs found for navigation");
       return;
     }
     
     const tabsList = Array.from(tabs);
-    const currentIndex = tabsList.findIndex(tab => tab.getAttribute('data-state') === 'active');
+    const currentIndex = tabsList.findIndex(tab => 
+      tab.getAttribute('data-state') === 'active' || 
+      tab.getAttribute('aria-selected') === 'true'
+    );
+    
     console.log(`Current tab index: ${currentIndex}`);
     
     let newIndex;
@@ -90,64 +130,78 @@ export const useControllerNavigation = () => {
     }
     
     console.log(`New tab index: ${newIndex}`);
+    
     // Ensure we're properly clicking the DOM element
     try {
       (tabsList[newIndex] as HTMLElement).click();
     } catch (error) {
-      console.error("Error clicking tab:", error);
+      console.error("Error clicking tab during navigation:", error);
     }
   }, [getAllTabs]);
   
-  // Initialize tabs immediately when component mounts
-  useEffect(() => {
-    console.log("Initializing controller navigation immediately");
+  // Function to ensure tabs are initialized as soon as they're available
+  const ensureTabsInitialized = useCallback(() => {
+    if (isInitialized) return;
     
-    // Force initial tab selection right away
-    const initializeNavigation = () => {
-      // Early exit if already initialized or document is not ready
-      if (initialized || !document.body) return;
+    const tabs = getAllTabs();
+    if (tabs.length === 0) {
+      console.log("No tabs found during initialization check");
+      return false;
+    }
+    
+    // Check if any tab is already active
+    const activeTab = getActiveTab();
+    if (!activeTab) {
+      // No active tab, click on the first tab or about tab
+      console.log("No active tab found during initialization, selecting first tab");
+      const aboutSuccess = navigateToTabByName('about');
       
-      const tabs = getAllTabs();
-      if (tabs.length > 0) {
-        // First check if any tab is already active
-        const activeTab = getActiveTab();
-        if (!activeTab) {
-          // No active tab, so click on the first one to initialize
-          console.log("No active tab found, clicking first tab");
-          try {
-            (tabs[0] as HTMLElement).click();
-          } catch (error) {
-            console.error("Error clicking initial tab:", error);
-          }
+      if (!aboutSuccess) {
+        try {
+          // Just try the first tab as a fallback
+          (tabs[0] as HTMLElement).click();
+          console.log("Clicked first tab as fallback");
+        } catch (error) {
+          console.error("Error clicking first tab:", error);
+          return false;
         }
-        setInitialized(true);
-      } else {
-        console.log("No tabs found during initialization");
       }
-    };
+    }
+    
+    console.log("Tab initialization successful");
+    setIsInitialized(true);
+    return true;
+  }, [getAllTabs, getActiveTab, navigateToTabByName, isInitialized]);
+  
+  // Set up polling to ensure controller is initialized as soon as tabs are available
+  useEffect(() => {
+    if (isInitialized) return;
     
     // Try to initialize immediately
-    initializeNavigation();
+    const immediateSuccess = ensureTabsInitialized();
+    if (immediateSuccess) return;
     
-    // And also set a backup timer for initialization
-    const initTimer = setTimeout(() => {
-      if (!initialized) {
-        console.log("Delayed initialization running");
-        initializeNavigation();
+    // Set up a polling mechanism to keep trying initialization
+    const initInterval = setInterval(() => {
+      initAttempts.current += 1;
+      console.log(`Initialization attempt #${initAttempts.current}`);
+      
+      const success = ensureTabsInitialized();
+      
+      // If successful or we've tried too many times, stop polling
+      if (success || initAttempts.current >= 10) {
+        clearInterval(initInterval);
         
-        // If still not initialized, try "about" tab specifically 
-        if (!initialized) {
-          const success = navigateToTabByName('about');
-          console.log(`Delayed initial navigation success: ${success}`);
-          if (success) {
-            setInitialized(true);
-          }
+        // Force initialization after max attempts to ensure controller works
+        if (initAttempts.current >= 10 && !isInitialized) {
+          console.log("Forcing initialization after max attempts");
+          setIsInitialized(true);
         }
       }
     }, 300);
     
-    return () => clearTimeout(initTimer);
-  }, [getAllTabs, getActiveTab, navigateToTabByName, initialized]);
+    return () => clearInterval(initInterval);
+  }, [ensureTabsInitialized, isInitialized]);
   
   // Set up event listeners for navigation
   useEffect(() => {
@@ -170,6 +224,11 @@ export const useControllerNavigation = () => {
     // Global event handler for keyboard navigation
     const handleKeyDown = (e: KeyboardEvent) => {
       console.log(`Key pressed: ${e.key}`);
+      
+      // Ensure tabs are initialized when any key is pressed
+      if (!isInitialized) {
+        ensureTabsInitialized();
+      }
       
       switch (e.key) {
         case 'ArrowUp':
@@ -233,12 +292,17 @@ export const useControllerNavigation = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [lastScrollPosition, navigateTabs, navigateToTabByName]);
+  }, [lastScrollPosition, navigateTabs, navigateToTabByName, isInitialized, ensureTabsInitialized]);
 
   // Function to handle D-pad button click
   const handleDPadClick = (direction: Direction) => {
     console.log(`D-pad clicked: ${direction}`);
     setActiveDirection(direction);
+    
+    // Ensure tabs are initialized when a button is clicked
+    if (!isInitialized) {
+      ensureTabsInitialized();
+    }
     
     switch (direction) {
       case 'up':
@@ -269,6 +333,11 @@ export const useControllerNavigation = () => {
   const handleButtonClick = (button: Button) => {
     console.log(`Button clicked: ${button}`);
     setActiveButton(button);
+    
+    // Ensure tabs are initialized when a button is clicked
+    if (!isInitialized) {
+      ensureTabsInitialized();
+    }
     
     // Direct navigation to specific tabs based on button
     switch (button) {

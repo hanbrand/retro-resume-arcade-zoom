@@ -1,4 +1,3 @@
-
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'neutral';
@@ -10,6 +9,14 @@ interface DPadProps {
 }
 
 const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
+  // Enhanced click handlers to ensure they're properly triggered
+  const handleDirectionClick = (direction: Direction, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default browser behavior
+    e.stopPropagation(); // Stop event bubbling
+    console.log(`Clicking D-pad direction: ${direction}`);
+    onDirectionClick(direction);
+  };
+
   return (
     <div className="absolute left-6 top-1/2 -translate-y-1/2 w-20 h-20 bg-gray-400 rounded-full flex items-center justify-center">
       {/* D-pad cross */}
@@ -19,7 +26,7 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         
         {/* Up button */}
         <button 
-          onClick={() => onDirectionClick('up')}
+          onClick={(e) => handleDirectionClick('up', e)}
           className={`absolute w-5 h-5 top-0 left-1/2 -translate-x-1/2 -translate-y-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'up' || keyPressed === 'up' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
@@ -30,7 +37,7 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         
         {/* Down button */}
         <button 
-          onClick={() => onDirectionClick('down')}
+          onClick={(e) => handleDirectionClick('down', e)}
           className={`absolute w-5 h-5 bottom-0 left-1/2 -translate-x-1/2 translate-y-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'down' || keyPressed === 'down' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
@@ -39,9 +46,9 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
           <ArrowDown size={14} className={`${keyPressed === 'down' || activeDirection === 'down' ? 'text-black' : 'text-gray-600'}`} />
         </button>
         
-        {/* Left button */}
+        {/* Left button - enhanced for navigation */}
         <button 
-          onClick={() => onDirectionClick('left')}
+          onClick={(e) => handleDirectionClick('left', e)}
           className={`absolute w-5 h-5 left-0 top-1/2 -translate-y-1/2 -translate-x-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'left' || keyPressed === 'left' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
@@ -50,9 +57,9 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
           <ArrowLeft size={14} className={`${keyPressed === 'left' || activeDirection === 'left' ? 'text-black' : 'text-gray-600'}`} />
         </button>
         
-        {/* Right button */}
+        {/* Right button - enhanced for navigation */}
         <button 
-          onClick={() => onDirectionClick('right')}
+          onClick={(e) => handleDirectionClick('right', e)}
           className={`absolute w-5 h-5 right-0 top-1/2 -translate-y-1/2 translate-x-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'right' || keyPressed === 'right' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
