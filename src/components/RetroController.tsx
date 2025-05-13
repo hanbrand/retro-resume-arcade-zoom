@@ -18,19 +18,62 @@ const RetroController = () => {
     navigateToTabByName
   } = useControllerNavigation();
   const { isVisible } = useControllerVisibility(controllerRef);
+  const initialized = useRef(false);
 
-  // Initialize navigation on mount to ensure tabs are active
+  // Force select a tab programmatically (more direct than DOM click)
+  const forceSelectTab = (tabName: string) => {
+    console.log(`Forcing tab selection: ${tabName}`);
+    // Try direct context update first (most reliable)
+    try {
+      setCurrentSection(tabName);
+      return true;
+    } catch (error) {
+      console.error("Error setting section via context:", error);
+    }
+
+    // Fallback to DOM manipulation
+    try {
+      return navigateToTabByName(tabName);
+    } catch (error) {
+      console.error("Error navigating to tab:", error);
+      return false;
+    }
+  };
+
+  // Initialize aggressively on mount to ensure tabs are active immediately
   useEffect(() => {
     console.log("RetroController mounted, initializing navigation");
-    // Pre-select the current section or default to 'about'
-    const initialTab = currentSection || 'about';
-    setTimeout(() => {
-      navigateToTabByName(initialTab);
-    }, 300);
-  }, [currentSection, navigateToTabByName]);
 
-  // Direct mapping of button to tab values - handle null case separately
-  const buttonToTabMap: Partial<Record<string, string>> = {
+    // Immediate initialization attempt
+    if (!initialized.current) {
+      // Pre-select the about tab or current section
+      const initialTab = currentSection || 'about';
+      
+      // Try immediately
+      let success = forceSelectTab(initialTab);
+      
+      // And also set up retries with increasing intervals
+      if (!success) {
+        const retryTimes = [100, 200, 300, 500, 1000, 2000];
+        retryTimes.forEach((delay, index) => {
+          setTimeout(() => {
+            if (!initialized.current) {
+              console.log(`Retry ${index + 1} for tab initialization`);
+              success = forceSelectTab(initialTab);
+              if (success) {
+                initialized.current = true;
+              }
+            }
+          }, delay);
+        });
+      } else {
+        initialized.current = true;
+      }
+    }
+  }, [currentSection, navigateToTabByName, setCurrentSection]);
+
+  // Direct mapping of button to tab values
+  const buttonToTabMap: Record<string, string> = {
     'a': 'about',
     'b': 'contact',
     'x': 'skills',
@@ -40,50 +83,68 @@ const RetroController = () => {
   // Enhanced handler for button clicks with direct tab setting
   const onButtonClick = (button: Button) => {
     console.log(`RetroController: Button clicked: ${button}`);
-    handleButtonClick(button);
     
-    // Also directly set the tab using the context if possible
-    if (button && buttonToTabMap[button]) {
-      try {
-        setCurrentSection(buttonToTabMap[button] as string);
-      } catch (error) {
-        console.error("Error setting section:", error);
-      }
+    // Ensure we're initialized on first click
+    if (!initialized.current) {
+      forceSelectTab('about');
+      initialized.current = true;
     }
+    
+    // If clicked a mapped button, force select the corresponding tab
+    if (button && buttonToTabMap[button]) {
+      forceSelectTab(buttonToTabMap[button]);
+    }
+    
+    // Also call the original handler for state updates
+    handleButtonClick(button);
   };
 
-  // Enhanced handler for D-pad clicks
+  // Enhanced handler for D-pad clicks with direct tab navigation
   const onDirectionClick = (direction: Direction) => {
     console.log(`RetroController: Direction clicked: ${direction}`);
-    handleDPadClick(direction);
     
-    // For left/right, modify tab directly when possible
+    // Ensure we're initialized on first click
+    if (!initialized.current) {
+      forceSelectTab('about');
+      initialized.current = true;
+    }
+    
+    // Handle left/right navigation directly
     if (direction === 'left' || direction === 'right') {
       // Get all tab values in order
       const tabValues = ['about', 'skills', 'experience', 'contact'];
-      const currentIndex = tabValues.indexOf(currentSection);
       
-      if (currentIndex !== -1) {
-        let newIndex;
-        if (direction === 'left') {
-          newIndex = (currentIndex - 1 + tabValues.length) % tabValues.length;
-        } else { // right
-          newIndex = (currentIndex + 1) % tabValues.length;
-        }
-        
-        try {
-          setCurrentSection(tabValues[newIndex]);
-        } catch (error) {
-          console.error("Error setting section:", error);
-        }
+      // Find current position or default to first tab
+      let currentIndex = tabValues.indexOf(currentSection);
+      if (currentIndex === -1) currentIndex = 0;
+      
+      // Calculate next tab index
+      let newIndex;
+      if (direction === 'left') {
+        newIndex = (currentIndex - 1 + tabValues.length) % tabValues.length;
+      } else { // right
+        newIndex = (currentIndex + 1) % tabValues.length;
       }
+      
+      // Force select the new tab
+      forceSelectTab(tabValues[newIndex]);
     }
+    
+    // Also call the original handler for scrolling/state updates
+    handleDPadClick(direction);
   };
 
   return (
     <div 
       ref={controllerRef} 
       className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-20'}`}
+      onMouseEnter={() => {
+        // Ensure tabs are initialized when mouse hovers over controller
+        if (!initialized.current) {
+          forceSelectTab('about');
+          initialized.current = true;
+        }
+      }}
     >
       <ControllerBody 
         activeDirection={activeDirection}

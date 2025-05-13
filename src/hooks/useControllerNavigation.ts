@@ -9,6 +9,32 @@ export const useControllerNavigation = () => {
   const [keyPressed, setKeyPressed] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const initAttempts = useRef(0);
+  const tabsPollingInterval = useRef<number | null>(null);
+  
+  // Function to click a button on an element
+  const clickElement = (element: HTMLElement | null) => {
+    if (!element) return false;
+    
+    try {
+      // Try using the native click method
+      element.click();
+      return true;
+    } catch (e) {
+      try {
+        // Fallback: create and dispatch a click event
+        const event = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: true
+        });
+        element.dispatchEvent(event);
+        return true;
+      } catch (e2) {
+        console.error('Failed to click element', e2);
+        return false;
+      }
+    }
+  };
   
   // Function to get all tabs - searching by actual DOM attributes
   const getAllTabs = useCallback(() => {
@@ -19,7 +45,7 @@ export const useControllerNavigation = () => {
   
   // Function to get the currently active tab
   const getActiveTab = useCallback(() => {
-    const activeTab = document.querySelector('[role="tab"][data-state="active"]');
+    const activeTab = document.querySelector('[role="tab"][data-state="active"], [role="tab"][aria-selected="true"]');
     if (activeTab) {
       console.log(`Active tab: ${activeTab.textContent}`);
     } else {
@@ -32,7 +58,7 @@ export const useControllerNavigation = () => {
   const clickTabByValue = useCallback((tabValue: string) => {
     // Handle specific tab values that might have different text
     const valueMap: Record<string, string[]> = {
-      'about': ['about', 'purple'],
+      'about': ['about', 'purple', 'gamepad'],
       'skills': ['skills', 'pink', 'disc'],
       'experience': ['experience', 'cyan', 'clock'],
       'contact': ['contact', 'orange', 'headphones']
@@ -44,7 +70,12 @@ export const useControllerNavigation = () => {
     // Try to find the tab with the attribute value first (most reliable)
     let targetTab = document.querySelector(`[role="tab"][value="${tabValue}"]`) as HTMLElement;
     
-    // If not found by attribute, try by text content
+    // If not found by attribute, try by other attributes
+    if (!targetTab) {
+      targetTab = document.querySelector(`[role="tab"][data-section="${tabValue}"]`) as HTMLElement;
+    }
+    
+    // If still not found, try by text content or class
     if (!targetTab) {
       const allTabs = document.querySelectorAll('[role="tab"]');
       
@@ -65,12 +96,7 @@ export const useControllerNavigation = () => {
     // If we found a tab, click it
     if (targetTab) {
       console.log(`Clicking tab with text: ${targetTab.textContent}`);
-      try {
-        targetTab.click();
-        return true;
-      } catch (error) {
-        console.error("Error clicking tab:", error);
-      }
+      return clickElement(targetTab);
     }
     
     return false;
@@ -89,12 +115,7 @@ export const useControllerNavigation = () => {
     const tabs = getAllTabs();
     if (tabs.length > 0) {
       console.log("Falling back to first tab");
-      try {
-        (tabs[0] as HTMLElement).click();
-        return true;
-      } catch (error) {
-        console.error("Error clicking tab:", error);
-      }
+      return clickElement(tabs[0] as HTMLElement);
     }
     
     return false;
@@ -132,16 +153,12 @@ export const useControllerNavigation = () => {
     console.log(`New tab index: ${newIndex}`);
     
     // Ensure we're properly clicking the DOM element
-    try {
-      (tabsList[newIndex] as HTMLElement).click();
-    } catch (error) {
-      console.error("Error clicking tab during navigation:", error);
-    }
+    clickElement(tabsList[newIndex] as HTMLElement);
   }, [getAllTabs]);
   
   // Function to ensure tabs are initialized as soon as they're available
   const ensureTabsInitialized = useCallback(() => {
-    if (isInitialized) return;
+    if (isInitialized) return true;
     
     const tabs = getAllTabs();
     if (tabs.length === 0) {
@@ -157,12 +174,9 @@ export const useControllerNavigation = () => {
       const aboutSuccess = navigateToTabByName('about');
       
       if (!aboutSuccess) {
-        try {
-          // Just try the first tab as a fallback
-          (tabs[0] as HTMLElement).click();
-          console.log("Clicked first tab as fallback");
-        } catch (error) {
-          console.error("Error clicking first tab:", error);
+        // Just try the first tab as a fallback
+        if (!clickElement(tabs[0] as HTMLElement)) {
+          console.error("Error clicking first tab");
           return false;
         }
       }
@@ -175,32 +189,58 @@ export const useControllerNavigation = () => {
   
   // Set up polling to ensure controller is initialized as soon as tabs are available
   useEffect(() => {
-    if (isInitialized) return;
+    // Stop if already initialized
+    if (isInitialized) {
+      if (tabsPollingInterval.current) {
+        clearInterval(tabsPollingInterval.current);
+        tabsPollingInterval.current = null;
+      }
+      return;
+    }
     
     // Try to initialize immediately
     const immediateSuccess = ensureTabsInitialized();
-    if (immediateSuccess) return;
     
-    // Set up a polling mechanism to keep trying initialization
-    const initInterval = setInterval(() => {
-      initAttempts.current += 1;
-      console.log(`Initialization attempt #${initAttempts.current}`);
+    // Set up polling to keep trying if immediate init failed
+    if (!immediateSuccess) {
+      // First try quick retries
+      const quickRetries = [100, 200, 300, 500];
+      quickRetries.forEach((delay, index) => {
+        setTimeout(() => {
+          if (!isInitialized) {
+            console.log(`Quick retry ${index + 1} for tab initialization`);
+            ensureTabsInitialized();
+          }
+        }, delay);
+      });
       
-      const success = ensureTabsInitialized();
-      
-      // If successful or we've tried too many times, stop polling
-      if (success || initAttempts.current >= 10) {
-        clearInterval(initInterval);
+      // Then set up a slower polling interval for persistent attempts
+      tabsPollingInterval.current = window.setInterval(() => {
+        initAttempts.current += 1;
+        console.log(`Polling initialization attempt #${initAttempts.current}`);
         
-        // Force initialization after max attempts to ensure controller works
-        if (initAttempts.current >= 10 && !isInitialized) {
-          console.log("Forcing initialization after max attempts");
-          setIsInitialized(true);
+        const success = ensureTabsInitialized();
+        
+        // If successful or we've tried too many times, stop polling
+        if (success || initAttempts.current >= 20) {
+          clearInterval(tabsPollingInterval.current!);
+          tabsPollingInterval.current = null;
+          
+          // Force initialization after max attempts
+          if (!isInitialized && initAttempts.current >= 20) {
+            console.log("Forcing initialization after max attempts");
+            setIsInitialized(true);
+          }
         }
-      }
-    }, 300);
+      }, 1000);
+    }
     
-    return () => clearInterval(initInterval);
+    return () => {
+      if (tabsPollingInterval.current) {
+        clearInterval(tabsPollingInterval.current);
+        tabsPollingInterval.current = null;
+      }
+    };
   }, [ensureTabsInitialized, isInitialized]);
   
   // Set up event listeners for navigation
