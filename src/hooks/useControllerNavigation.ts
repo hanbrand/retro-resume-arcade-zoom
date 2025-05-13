@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Direction } from '@/components/controller/DPad';
 import { Button } from '@/components/controller/types';
@@ -8,6 +7,7 @@ export const useControllerNavigation = () => {
   const [activeButton, setActiveButton] = useState<Button>(null);
   const [lastScrollPosition, setLastScrollPosition] = useState(0);
   const [keyPressed, setKeyPressed] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
   
   // Function to get all tabs - searching by actual DOM attributes
   const getAllTabs = useCallback(() => {
@@ -90,20 +90,67 @@ export const useControllerNavigation = () => {
     }
     
     console.log(`New tab index: ${newIndex}`);
-    (tabsList[newIndex] as HTMLElement).click();
+    // Ensure we're properly clicking the DOM element
+    try {
+      (tabsList[newIndex] as HTMLElement).click();
+    } catch (error) {
+      console.error("Error clicking tab:", error);
+    }
   }, [getAllTabs]);
   
-  // Initialize tabs when component mounts
+  // Initialize tabs immediately when component mounts
   useEffect(() => {
-    console.log("Initializing controller navigation");
+    console.log("Initializing controller navigation immediately");
     
-    // Force initial tab selection if not already done
+    // Force initial tab selection right away
+    const initializeNavigation = () => {
+      // Early exit if already initialized or document is not ready
+      if (initialized || !document.body) return;
+      
+      const tabs = getAllTabs();
+      if (tabs.length > 0) {
+        // First check if any tab is already active
+        const activeTab = getActiveTab();
+        if (!activeTab) {
+          // No active tab, so click on the first one to initialize
+          console.log("No active tab found, clicking first tab");
+          try {
+            (tabs[0] as HTMLElement).click();
+          } catch (error) {
+            console.error("Error clicking initial tab:", error);
+          }
+        }
+        setInitialized(true);
+      } else {
+        console.log("No tabs found during initialization");
+      }
+    };
+    
+    // Try to initialize immediately
+    initializeNavigation();
+    
+    // And also set a backup timer for initialization
     const initTimer = setTimeout(() => {
-      // Try to navigate to the "about" tab to ensure initial tab is active
-      const success = navigateToTabByName('about');
-      console.log(`Initial navigation success: ${success}`);
-    }, 500);
+      if (!initialized) {
+        console.log("Delayed initialization running");
+        initializeNavigation();
+        
+        // If still not initialized, try "about" tab specifically 
+        if (!initialized) {
+          const success = navigateToTabByName('about');
+          console.log(`Delayed initial navigation success: ${success}`);
+          if (success) {
+            setInitialized(true);
+          }
+        }
+      }
+    }, 300);
     
+    return () => clearTimeout(initTimer);
+  }, [getAllTabs, getActiveTab, navigateToTabByName, initialized]);
+  
+  // Set up event listeners for navigation
+  useEffect(() => {
     // Scroll handling for up/down directions
     const handleScroll = () => {
       const currentScroll = window.scrollY;
@@ -182,7 +229,6 @@ export const useControllerNavigation = () => {
     window.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      clearTimeout(initTimer);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
@@ -202,9 +248,11 @@ export const useControllerNavigation = () => {
         window.scrollBy(0, 150);
         break;
       case 'left':
+        console.log("Left direction clicked, navigating to previous tab");
         navigateTabs('prev');
         break;
       case 'right':
+        console.log("Right direction clicked, navigating to next tab");
         navigateTabs('next');
         break;
       default:
@@ -225,15 +273,19 @@ export const useControllerNavigation = () => {
     // Direct navigation to specific tabs based on button
     switch (button) {
       case 'a':
+        console.log("A button clicked, navigating to about tab");
         navigateToTabByName('about');
         break;
       case 'b':
+        console.log("B button clicked, navigating to contact tab");
         navigateToTabByName('contact');
         break;
       case 'x':
+        console.log("X button clicked, navigating to skills tab");
         navigateToTabByName('skills');
         break;
       case 'y':
+        console.log("Y button clicked, navigating to experience tab");
         navigateToTabByName('experience');
         break;
       default:
