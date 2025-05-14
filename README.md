@@ -1,14 +1,5 @@
 # Brandon Han — Developer & ML Engineer Portfolio 🚀
 
-Welcome! This repo contains the source code for **my personal portfolio website**, a single-page spot where I showcase projects, publications, and the occasional hot-take on data science.  
-Live site 👉 **https://YOUR-COOL-DOMAIN.com**
-
-<!--
-    ▸ Tip: drag-and-drop a static screenshot or short GIF demo right here.
-    ▸ Example:
-    ![Portfolio screenshot](./assets/portfolio-screenshot.png)
--->
-
 ---
 
 ## ✨ Features
