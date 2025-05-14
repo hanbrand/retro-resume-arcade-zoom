@@ -77,14 +77,14 @@ const ContactSection = () => {
                   <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
                     <span className="text-xl">📧</span>
                   </div>
-                  <span>brandonh4n@gmail.com</span>
+                  <span></span>
                 </div>
                 
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
                     <span className="text-xl">📱</span>
                   </div>
-                  <span>626-404-4082</span>
+                  <span></span>
                 </div>
                 
                 <div className="flex items-center gap-3">
