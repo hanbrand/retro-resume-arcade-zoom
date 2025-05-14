@@ -64,7 +64,7 @@ export const useControllerNavigation = () => {
         const value = element.getAttribute('value');
         if (value) {
           // Deactivate all TabsContent elements first
-          document.querySelectorAll('[data-state="active"][role="tabpanel"]').forEach(panel => {
+          document.querySelectorAll('[data-state="active"][role="tabpanel"], [data-state="active"].Tab, .TabsContent[data-state="active"]').forEach(panel => {
             (panel as HTMLElement).setAttribute('data-state', 'inactive');
           });
           
@@ -76,7 +76,10 @@ export const useControllerNavigation = () => {
             `[role="tabpanel"][data-value="${value}"]`,
             `[data-state][data-orientation][value="${value}"]`,
             `#${value}-content`, // Try by ID
-            `[data-tab-content="${value}"]` // Try by custom attribute
+            `[data-tab-content="${value}"]`, // Try by custom attribute
+            `.TabsContent[value="${value}"]`, // Try by class and value
+            `div[role="tabpanel"][tabindex="0"]`, // Try by role and tabindex
+            `div[value="${value}"]` // Try by value only
           ];
           
           // Try each selector
@@ -87,30 +90,29 @@ export const useControllerNavigation = () => {
               console.log(`Found tab content with selector: ${selector}`);
               contentFound = true;
               (content as HTMLElement).setAttribute('data-state', 'active');
+              
+              // Ensure element is visible
+              (content as HTMLElement).style.display = 'block';
               break;
             }
           }
           
-          // If still not found, look for TabsContent by searching TabsContent elements that match the value
+          // If still not found, look for any TabsContent element
           if (!contentFound) {
-            // Search for any element that might be the content panel
-            const allPanels = document.querySelectorAll('[role="tabpanel"]');
-            for (const panel of Array.from(allPanels)) {
-              if ((panel as HTMLElement).getAttribute('value') === value) {
-                (panel as HTMLElement).setAttribute('data-state', 'active');
+            console.log('Looking for TabsContent directly');
+            const allContents = document.querySelectorAll('[role="tabpanel"], .TabsContent, [data-tab-content]');
+            
+            if (allContents.length > 0) {
+              // Map active tab index to content index
+              const tabs = document.querySelectorAll('[role="tab"]');
+              const activeTabIndex = Array.from(tabs).findIndex(tab => tab === element);
+              
+              if (activeTabIndex >= 0 && activeTabIndex < allContents.length) {
+                const targetContent = allContents[activeTabIndex] as HTMLElement;
+                targetContent.setAttribute('data-state', 'active');
+                console.log(`Activated content by index match`);
                 contentFound = true;
-                break;
               }
-            }
-          }
-          
-          // One more try - look for elements inside [data-orientation="horizontal"] container
-          if (!contentFound) {
-            // Find the element directly from the TabsContent component
-            const contentElement = document.querySelector(`[data-state="inactive"][value="${value}"]`);
-            if (contentElement) {
-              (contentElement as HTMLElement).setAttribute('data-state', 'active');
-              contentFound = true;
             }
           }
           
@@ -305,8 +307,66 @@ export const useControllerNavigation = () => {
     console.log(`New tab index: ${newIndex}`);
     
     // Ensure we're properly clicking the DOM element
-    clickElement(tabsList[newIndex] as HTMLElement);
-  }, [getAllTabs]);
+    const success = clickElement(tabsList[newIndex] as HTMLElement);
+    
+    if (!success) {
+      console.log("Click element failed, trying direct content update");
+      
+      // Fallback: Try direct content update
+      // First deactivate all tabs except the current one
+      tabsList.forEach((tab, index) => {
+        const tabEl = tab as HTMLElement;
+        if (index === newIndex) {
+          tabEl.setAttribute('data-state', 'active');
+          tabEl.setAttribute('aria-selected', 'true');
+        } else {
+          tabEl.setAttribute('data-state', 'inactive');
+          tabEl.setAttribute('aria-selected', 'false');
+        }
+      });
+      
+      // Then find and update tab content panels
+      const activeTab = tabsList[newIndex] as HTMLElement;
+      const tabValue = activeTab.getAttribute('value');
+      
+      if (tabValue) {
+        // Find all content panels
+        const contentPanels = document.querySelectorAll('[role="tabpanel"], [data-state][value]');
+        const contentList = Array.from(contentPanels);
+        
+        // Try to find the matching content panel by value
+        let matchingContent = null;
+        for (const panel of contentList) {
+          const contentEl = panel as HTMLElement;
+          if (contentEl.getAttribute('value') === tabValue) {
+            matchingContent = contentEl;
+            break;
+          }
+        }
+        
+        // If not found by value, try by index correlation
+        if (!matchingContent && contentList.length > 0) {
+          // If content count matches tab count, use the same index
+          if (contentList.length === tabsList.length) {
+            matchingContent = contentList[newIndex] as HTMLElement;
+          }
+        }
+        
+        // Update content panel states
+        if (matchingContent) {
+          contentList.forEach(panel => {
+            const panelEl = panel as HTMLElement;
+            if (panel === matchingContent) {
+              panelEl.setAttribute('data-state', 'active');
+              panelEl.style.display = 'block';
+            } else {
+              panelEl.setAttribute('data-state', 'inactive');
+            }
+          });
+        }
+      }
+    }
+  }, [getAllTabs, clickElement]);
   
   // Function to ensure tabs are initialized as soon as they're available
   const ensureTabsInitialized = useCallback(() => {
@@ -505,10 +565,12 @@ export const useControllerNavigation = () => {
         break;
       case 'left':
         console.log("Left direction clicked, navigating to previous tab");
+        // Use the same function that keyboard navigation uses for consistency
         navigateTabs('prev');
         break;
       case 'right':
         console.log("Right direction clicked, navigating to next tab");
+        // Use the same function that keyboard navigation uses for consistency
         navigateTabs('next');
         break;
       default:

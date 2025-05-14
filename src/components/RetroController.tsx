@@ -218,10 +218,78 @@ const RetroController = () => {
       setNavigationDebug(prev => `${prev}, Forced initialization on button click`);
     }
     
-    // If clicked a mapped button, force select the corresponding tab
+    // If clicked a mapped button, navigate to the corresponding tab
     if (button && buttonToTabMap[button]) {
-      const success = forceSelectTab(buttonToTabMap[button]);
-      setNavigationDebug(prev => `${prev}, Tab selection ${success ? 'succeeded' : 'failed'}`);
+      const tabName = buttonToTabMap[button];
+      
+      // Update the context state
+      setCurrentSection(tabName);
+      
+      // Directly manipulate DOM for immediate feedback
+      // 1. Find and activate the tab trigger
+      const tabId = `${tabName}-tab`;
+      const tabElement = document.getElementById(tabId);
+      if (tabElement) {
+        // Activate this tab, deactivate others
+        document.querySelectorAll('[role="tab"]').forEach(tab => {
+          const isTargetTab = tab === tabElement;
+          tab.setAttribute('data-state', isTargetTab ? 'active' : 'inactive');
+          tab.setAttribute('aria-selected', isTargetTab ? 'true' : 'false');
+        });
+      }
+      
+      // 2. Find and activate the content panel
+      const contentId = `${tabName}-content`;
+      const contentElement = document.getElementById(contentId);
+      if (contentElement) {
+        // Activate this content, deactivate others
+        document.querySelectorAll('[role="tabpanel"]').forEach(panel => {
+          const isTargetPanel = panel === contentElement;
+          panel.setAttribute('data-state', isTargetPanel ? 'active' : 'inactive');
+        });
+        
+        setNavigationDebug(prev => `${prev}, Directly activated ${tabName} content`);
+      } else {
+        // Try fallback selectors if ID doesn't work
+        const fallbackContentSelectors = [
+          `[role="tabpanel"][value="${tabName}"]`,
+          `[data-tab-content="${tabName}"]`,
+          `.TabsContent[value="${tabName}"]`
+        ];
+        
+        let contentFound = false;
+        for (const selector of fallbackContentSelectors) {
+          const content = document.querySelector(selector);
+          if (content) {
+            // Deactivate all panels
+            document.querySelectorAll('[role="tabpanel"]').forEach(panel => {
+              panel.setAttribute('data-state', 'inactive');
+            });
+            
+            // Activate this one
+            (content as HTMLElement).setAttribute('data-state', 'active');
+            contentFound = true;
+            setNavigationDebug(prev => `${prev}, Activated content with selector: ${selector}`);
+            break;
+          }
+        }
+        
+        if (!contentFound) {
+          // Last resort: try to match panel index with button index
+          const buttons = ['a', 'b', 'x', 'y'];
+          const buttonIndex = buttons.indexOf(button);
+          const panels = document.querySelectorAll('[role="tabpanel"]');
+          
+          if (buttonIndex >= 0 && buttonIndex < panels.length) {
+            // Deactivate all panels
+            panels.forEach((panel, idx) => {
+              panel.setAttribute('data-state', idx === buttonIndex ? 'active' : 'inactive');
+            });
+            
+            setNavigationDebug(prev => `${prev}, Activated content by index match`);
+          }
+        }
+      }
     }
     
     // Also call the original handler for state updates
@@ -240,7 +308,10 @@ const RetroController = () => {
       setNavigationDebug(prev => `${prev}, Forced initialization on direction click`);
     }
     
-    // Handle left/right navigation directly
+    // Call the hook's handler directly - it already has the logic to navigate tabs
+    handleDPadClick(direction);
+    
+    // Additional direct TabContent handling for left/right (belt and suspenders approach)
     if (direction === 'left' || direction === 'right') {
       // Get all tab values in order
       const tabValues = ['about', 'skills', 'experience', 'contact'];
@@ -257,13 +328,21 @@ const RetroController = () => {
         newIndex = (currentIndex + 1) % tabValues.length;
       }
       
-      // Force select the new tab
-      const success = forceSelectTab(tabValues[newIndex]);
-      setNavigationDebug(prev => `${prev}, Tab selection to ${tabValues[newIndex]} ${success ? 'succeeded' : 'failed'}`);
+      // Access tab content directly as well - activate content by ID
+      const contentId = `${tabValues[newIndex]}-content`;
+      const contentElement = document.getElementById(contentId);
+      
+      if (contentElement) {
+        // Deactivate all content panels
+        document.querySelectorAll('[role="tabpanel"]').forEach(panel => {
+          panel.setAttribute('data-state', 'inactive');
+        });
+        
+        // Activate this content panel
+        contentElement.setAttribute('data-state', 'active');
+        setNavigationDebug(prev => `${prev}, Directly activated ${tabValues[newIndex]} content`);
+      }
     }
-    
-    // Also call the original handler for scrolling/state updates
-    handleDPadClick(direction);
   };
 
   return (
