@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Disc } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
@@ -32,7 +31,7 @@ const ContactSection = () => {
   const validateForm = () => {
     const errors = {
       name: formData.name.trim() === '',
-      email: !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email),
+      email: !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/),
       message: formData.message.trim() === ''
     };
     
@@ -71,36 +70,34 @@ const ContactSection = () => {
           <div>
             <div className="border-2 border-arcade-neonPink p-4 bg-black/40 rounded-md">
               <h3 className="font-press-start text-sm text-arcade-cyan mb-4">CONNECT</h3>
-
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
-                    <span className="text-xl">🌐</span>
-                  </div>
-                  <a href="https://www.linkedin.com/in/brandon-han-63b061239/" target="_blank" rel="noopener noreferrer" 
-                     className="hover:text-arcade-cyan transition-colors">
-                    linkedin.com/in/brandon-han-63b061239/
-                  </a>
+              
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
+                  <span className="text-xl">🌐</span>
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
-                    <span className="text-xl">💻</span>
-                  </div>
-                  <a href="https://github.com/hanbrand" target="_blank" rel="noopener noreferrer" 
-                     className="hover:text-arcade-cyan transition-colors">
-                    github.com/hanbrand
-                  </a>
-                </div>
+                <a href="https://www.linkedin.com/in/brandon-han-63b061239/" target="_blank" rel="noopener noreferrer" 
+                   className="hover:text-arcade-cyan transition-colors">
+                  linkedin.com/in/brandon-han-63b061239/
+                </a>
               </div>
               
-              <div className="mt-8">
-                <h3 className="font-press-start text-sm text-arcade-neonPink mb-4">LOCATION</h3>
-                
-                <div className="border border-arcade-cyan/30 p-4 rounded-md bg-arcade-darkPurple/50">
-                  <div className="mb-2 text-arcade-cyan">Los Angeles, CA</div>
-                  <p>Available for opportunities in Los Angeles and remote positions worldwide.</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
+                  <span className="text-xl">💻</span>
                 </div>
+                <a href="https://github.com/hanbrand" target="_blank" rel="noopener noreferrer" 
+                   className="hover:text-arcade-cyan transition-colors">
+                  github.com/hanbrand
+                </a>
+              </div>
+            </div>
+            
+            <div className="mt-8">
+              <h3 className="font-press-start text-sm text-arcade-neonPink mb-4">LOCATION</h3>
+              
+              <div className="border border-arcade-cyan/30 p-4 rounded-md bg-arcade-darkPurple/50">
+                <div className="mb-2 text-arcade-cyan">Los Angeles, CA</div>
+                <p>Available for opportunities in Los Angeles and remote positions worldwide.</p>
               </div>
             </div>
           </div>
