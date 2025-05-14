@@ -36,6 +36,12 @@ const ArcadeScreen = () => {
     console.log("Section changed to:", currentSection);
   }, [currentSection]);
 
+  // Explicit handler for tab changes to help with debugging
+  const handleTabChange = (value: string) => {
+    console.log(`Tab changed to: ${value}`);
+    setCurrentSection(value);
+  };
+
   return (
     <NavigationContext.Provider value={{ currentSection, setCurrentSection }}>
       <div className="relative w-full min-h-screen flex flex-col items-center bg-arcade-darkPurple overflow-x-hidden">
@@ -65,9 +71,8 @@ const ArcadeScreen = () => {
 
               {/* Main content */}
               <Tabs 
-                defaultValue="about" 
                 value={currentSection} 
-                onValueChange={setCurrentSection} 
+                onValueChange={handleTabChange} 
                 className="w-full"
               >
                 <div className="border-2 border-arcade-neonPink/50 rounded-md p-3 mb-8 bg-black/40 backdrop-blur">
