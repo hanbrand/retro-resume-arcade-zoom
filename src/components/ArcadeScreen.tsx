@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext, useContext } from 'react';
+import { useEffect, useState, createContext, useContext, useRef } from 'react';
 import { Gamepad, Headphones, Disc, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SkillsSection from './SkillsSection';
@@ -19,11 +19,20 @@ export const useNavigation = () => useContext(NavigationContext);
 const ArcadeScreen = () => {
   const [loaded, setLoaded] = useState(false);
   const [currentSection, setCurrentSection] = useState("about");
+  const tabsListRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Simulate loading time for the retro effect
     const timer = setTimeout(() => {
       setLoaded(true);
+      
+      // Once loaded, make sure the tabs are focused for keyboard navigation
+      setTimeout(() => {
+        const activeTab = document.querySelector('[role="tab"][data-state="active"]');
+        if (activeTab) {
+          (activeTab as HTMLElement).focus();
+        }
+      }, 500);
     }, 1000);
 
     console.log("ArcadeScreen mounted - current section:", currentSection);
@@ -40,6 +49,30 @@ const ArcadeScreen = () => {
   const handleTabChange = (value: string) => {
     console.log(`Tab changed to: ${value}`);
     setCurrentSection(value);
+    
+    // When tab changes, ensure proper focus management for keyboard navigation
+    setTimeout(() => {
+      const activeTab = document.querySelector(`[role="tab"][value="${value}"]`);
+      if (activeTab) {
+        (activeTab as HTMLElement).focus();
+      }
+    }, 10);
+  };
+
+  // Add a focus handler to improve keyboard accessibility
+  const handleTabsListFocus = () => {
+    console.log("TabsList focused");
+    // Ensure an active tab is selected when tabList gets focus
+    const activeTab = document.querySelector('[role="tab"][data-state="active"]');
+    if (activeTab) {
+      (activeTab as HTMLElement).focus();
+    } else {
+      // If no active tab, focus the first one
+      const firstTab = document.querySelector('[role="tab"]');
+      if (firstTab) {
+        (firstTab as HTMLElement).focus();
+      }
+    }
   };
 
   return (
@@ -76,7 +109,12 @@ const ArcadeScreen = () => {
                 className="w-full"
               >
                 <div className="border-2 border-arcade-neonPink/50 rounded-md p-3 mb-8 bg-black/40 backdrop-blur">
-                  <TabsList className="grid grid-cols-2 md:grid-cols-4 bg-transparent gap-2">
+                  <TabsList 
+                    className="grid grid-cols-2 md:grid-cols-4 bg-transparent gap-2"
+                    ref={tabsListRef}
+                    onFocus={handleTabsListFocus}
+                    tabIndex={0}
+                  >
                     <TabsTrigger
                       value="about"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-purple data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-purple/50`}

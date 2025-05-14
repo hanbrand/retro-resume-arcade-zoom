@@ -31,6 +31,18 @@ const RetroController = () => {
     'y': 'experience'
   };
 
+  // Programmatically click the tab element
+  const clickTabElement = (tabValue: string) => {
+    const tabId = `${tabValue}-tab`;
+    const tabElement = document.getElementById(tabId);
+    if (tabElement) {
+      // Use the actual DOM click method to trigger the tab
+      tabElement.click();
+      return true;
+    }
+    return false;
+  };
+
   // Simple initialization to ensure a tab is selected on mount
   useEffect(() => {
     console.log("RetroController mounted, initializing navigation");
@@ -40,7 +52,9 @@ const RetroController = () => {
       initialized.current = true;
       // Only set the section if it's not already set
       if (!TAB_VALUES.includes(currentSection)) {
+        // Set state AND click the DOM element
         setCurrentSection('about');
+        setTimeout(() => clickTabElement('about'), 100);
         setNavigationDebug('Initialized to about tab');
       }
     }
@@ -61,9 +75,12 @@ const RetroController = () => {
           ? (currentIndex - 1 + TAB_VALUES.length) % TAB_VALUES.length
           : (currentIndex + 1) % TAB_VALUES.length;
         
-        // Set the new section - this updates the Radix Tabs state
-        setCurrentSection(TAB_VALUES[newIndex]);
-        setNavigationDebug(`Navigated to ${TAB_VALUES[newIndex]}`);
+        const newTab = TAB_VALUES[newIndex];
+        
+        // Update state AND programmatically click the tab
+        setCurrentSection(newTab);
+        setTimeout(() => clickTabElement(newTab), 10);
+        setNavigationDebug(`Navigated to ${newTab}`);
       }
     }
     
@@ -79,13 +96,35 @@ const RetroController = () => {
     // If clicked a mapped button, change to the corresponding tab
     if (button && buttonToTabMap[button]) {
       const tabName = buttonToTabMap[button];
+      
+      // Update state AND programmatically click the tab
       setCurrentSection(tabName);
+      setTimeout(() => clickTabElement(tabName), 10);
       setNavigationDebug(`Activated ${tabName} tab`);
     }
     
     // Call original handler for state updates
     originalHandleButtonClick(button);
   };
+
+  // Manually focus the active tab when keyboard events occur
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (['ArrowLeft', 'ArrowRight', 'a', 'b', 'x', 'y', 'A', 'B', 'X', 'Y'].includes(e.key)) {
+        // Ensure we have focus on the tab container for keyboard navigation to work
+        const tabsList = document.querySelector('[role="tablist"]');
+        if (tabsList) {
+          (tabsList as HTMLElement).focus();
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <div 
@@ -97,6 +136,7 @@ const RetroController = () => {
           initialized.current = true;
           if (!TAB_VALUES.includes(currentSection)) {
             setCurrentSection('about');
+            setTimeout(() => clickTabElement('about'), 100);
           }
           setNavigationDebug(`Initialized on mouse enter`);
         }

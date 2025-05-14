@@ -10,13 +10,10 @@ interface DPadProps {
 }
 
 const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
-  // Simplified click handler without requiring React types
-  const handleDirectionClick = (direction: Direction, e: any) => {
-    if (e) {
-      e.preventDefault(); // Prevent default browser behavior
-      e.stopPropagation(); // Stop event bubbling
-    }
+  // Direct handler to pass the direction to parent
+  const handleClick = (direction: Direction) => {
     console.log(`Clicking D-pad direction: ${direction}`);
+    // Call the parent handler directly - no event manipulation
     onDirectionClick(direction);
   };
 
@@ -29,7 +26,8 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         
         {/* Up button */}
         <button 
-          onClick={(e) => handleDirectionClick('up', e)}
+          onClick={() => handleClick('up')}
+          type="button"
           className={`absolute w-5 h-5 top-0 left-1/2 -translate-x-1/2 -translate-y-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'up' || keyPressed === 'up' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
@@ -40,7 +38,8 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         
         {/* Down button */}
         <button 
-          onClick={(e) => handleDirectionClick('down', e)}
+          onClick={() => handleClick('down')}
+          type="button"
           className={`absolute w-5 h-5 bottom-0 left-1/2 -translate-x-1/2 translate-y-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'down' || keyPressed === 'down' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
@@ -51,7 +50,8 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         
         {/* Left button */}
         <button 
-          onClick={(e) => handleDirectionClick('left', e)}
+          onClick={() => handleClick('left')}
+          type="button"
           className={`absolute w-5 h-5 left-0 top-1/2 -translate-y-1/2 -translate-x-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'left' || keyPressed === 'left' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
@@ -62,7 +62,8 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         
         {/* Right button */}
         <button 
-          onClick={(e) => handleDirectionClick('right', e)}
+          onClick={() => handleClick('right')}
+          type="button"
           className={`absolute w-5 h-5 right-0 top-1/2 -translate-y-1/2 translate-x-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
             activeDirection === 'right' || keyPressed === 'right' ? 'text-arcade-cyan' : 'text-gray-600'
           }`}
