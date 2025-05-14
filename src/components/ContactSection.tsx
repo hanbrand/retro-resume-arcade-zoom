@@ -71,21 +71,7 @@ const ContactSection = () => {
           <div>
             <div className="border-2 border-arcade-neonPink p-4 bg-black/40 rounded-md">
               <h3 className="font-press-start text-sm text-arcade-cyan mb-4">CONNECT</h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
-                    <span className="text-xl">📧</span>
-                  </div>
-                  <span></span>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">
-                    <span className="text-xl">📱</span>
-                  </div>
-                  <span></span>
-                </div>
+
                 
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-arcade-darkPurple flex items-center justify-center">

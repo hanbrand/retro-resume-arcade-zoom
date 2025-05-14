@@ -21,7 +21,7 @@ const RetroController = () => {
   const initialized = useRef(false);
   const [navigationDebug, setNavigationDebug] = useState<string>('');
 
-  // Force select a tab programmatically (more direct than DOM click)
+  // Force select a tab programmatically (more direct than DOM click and React state updates)
   const forceSelectTab = (tabName: string) => {
     console.log(`Forcing tab selection: ${tabName}`);
     setNavigationDebug(`Attempting to select: ${tabName}`);
@@ -34,12 +34,67 @@ const RetroController = () => {
       // Direct DOM manipulation as backup to ensure UI syncs with state
       const tabId = `${tabName}-tab`;
       const tabElement = document.getElementById(tabId);
+      
+      // Also target the content element directly
+      const contentId = `${tabName}-content`;
+      const contentElement = document.getElementById(contentId);
+      
       if (tabElement) {
-        // Manually trigger click and set attributes
+        // Manually trigger click and set attributes on the tab trigger
         tabElement.click();
         tabElement.setAttribute('data-state', 'active');
         tabElement.setAttribute('aria-selected', 'true');
-        setNavigationDebug(prev => `${prev}, DOM sync triggered`);
+        setNavigationDebug(prev => `${prev}, Tab trigger activated`);
+        
+        // Ensure all other tabs are inactive
+        document.querySelectorAll('[role="tab"]').forEach(tab => {
+          if (tab !== tabElement) {
+            tab.setAttribute('data-state', 'inactive');
+            tab.setAttribute('aria-selected', 'false');
+          }
+        });
+      }
+      
+      // Directly activate the content panel
+      if (contentElement) {
+        // Set the state attributes for the content panel
+        contentElement.setAttribute('data-state', 'active');
+        setNavigationDebug(prev => `${prev}, Content panel activated`);
+        
+        // Ensure all other content panels are inactive
+        document.querySelectorAll('[role="tabpanel"]').forEach(panel => {
+          if (panel !== contentElement) {
+            panel.setAttribute('data-state', 'inactive');
+          }
+        });
+      } else {
+        // Try alternative selectors if content element not found by ID
+        const contentSelectors = [
+          `[role="tabpanel"][value="${tabName}"]`,
+          `[data-tab-content="${tabName}"]`,
+          `[data-state][value="${tabName}"]`
+        ];
+        
+        let contentFound = false;
+        for (const selector of contentSelectors) {
+          const content = document.querySelector(selector);
+          if (content) {
+            // Set all other content panels to inactive
+            document.querySelectorAll('[role="tabpanel"], [data-state="active"][value]').forEach(panel => {
+              panel.setAttribute('data-state', 'inactive');
+            });
+            
+            // Set this content panel to active
+            (content as HTMLElement).setAttribute('data-state', 'active');
+            contentFound = true;
+            setNavigationDebug(prev => `${prev}, Content found with selector: ${selector}`);
+            break;
+          }
+        }
+        
+        if (!contentFound) {
+          setNavigationDebug(prev => `${prev}, Could not find content panel directly`);
+        }
       }
       
       return true;
@@ -48,7 +103,7 @@ const RetroController = () => {
       setNavigationDebug(prev => `${prev}, Context error`);
     }
 
-    // Fallback to DOM manipulation
+    // Fallback to hook's navigation function
     try {
       const success = navigateToTabByName(tabName);
       setNavigationDebug(prev => `${prev}, DOM navigation ${success ? 'succeeded' : 'failed'}`);
@@ -57,17 +112,37 @@ const RetroController = () => {
       if (!success) {
         const tabId = `${tabName}-tab`;
         const tabElement = document.getElementById(tabId);
+        const contentId = `${tabName}-content`;
+        const contentElement = document.getElementById(contentId);
+        
         if (tabElement) {
           setNavigationDebug(prev => `${prev}, Trying direct DOM access`);
           try {
+            // Activate tab trigger
             tabElement.click();
-            
-            // Manually update state if needed
             setCurrentSection(tabName);
-            
-            // Set ARIA and data attributes as last resort
             tabElement.setAttribute('data-state', 'active');
             tabElement.setAttribute('aria-selected', 'true');
+            
+            // Deactivate other tabs
+            document.querySelectorAll('[role="tab"]').forEach(tab => {
+              if (tab !== tabElement) {
+                tab.setAttribute('data-state', 'inactive');
+                tab.setAttribute('aria-selected', 'false');
+              }
+            });
+            
+            // Activate content panel if found
+            if (contentElement) {
+              contentElement.setAttribute('data-state', 'active');
+              
+              // Deactivate other content panels
+              document.querySelectorAll('[role="tabpanel"]').forEach(panel => {
+                if (panel !== contentElement) {
+                  panel.setAttribute('data-state', 'inactive');
+                }
+              });
+            }
             
             setNavigationDebug(prev => `${prev}, Direct DOM manipulation succeeded`);
             return true;

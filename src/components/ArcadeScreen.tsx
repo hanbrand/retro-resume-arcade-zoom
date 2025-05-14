@@ -116,7 +116,12 @@ const ArcadeScreen = () => {
                 </div>
 
                 <div className="border-2 border-arcade-cyan/50 rounded-md p-4 bg-black/40 backdrop-blur min-h-[50vh]">
-                  <TabsContent value="about" className="mt-0">
+                  <TabsContent 
+                    value="about" 
+                    className="mt-0"
+                    id="about-content"
+                    data-tab-content="about"
+                  >
                     <div className="text-white font-vt323 space-y-4">
                       <h2 className="text-2xl font-press-start text-arcade-cyan mb-4">ABOUT ME</h2>
                       
@@ -169,15 +174,30 @@ const ArcadeScreen = () => {
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="skills" className="mt-0">
+                  <TabsContent 
+                    value="skills" 
+                    className="mt-0"
+                    id="skills-content"
+                    data-tab-content="skills"
+                  >
                     <SkillsSection />
                   </TabsContent>
 
-                  <TabsContent value="experience" className="mt-0">
+                  <TabsContent 
+                    value="experience" 
+                    className="mt-0"
+                    id="experience-content"
+                    data-tab-content="experience"
+                  >
                     <ExperienceSection />
                   </TabsContent>
 
-                  <TabsContent value="contact" className="mt-0">
+                  <TabsContent 
+                    value="contact" 
+                    className="mt-0"
+                    id="contact-content"
+                    data-tab-content="contact"
+                  >
                     <ContactSection />
                   </TabsContent>
                 </div>

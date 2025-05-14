@@ -63,10 +63,58 @@ export const useControllerNavigation = () => {
         // Try to find and activate related content
         const value = element.getAttribute('value');
         if (value) {
-          const content = document.querySelector(`[data-state="inactive"][data-orientation="horizontal"][value="${value}"]`);
-          if (content) {
-            (content as HTMLElement).setAttribute('data-state', 'active');
+          // Deactivate all TabsContent elements first
+          document.querySelectorAll('[data-state="active"][role="tabpanel"]').forEach(panel => {
+            (panel as HTMLElement).setAttribute('data-state', 'inactive');
+          });
+          
+          // Try multiple possible selectors for finding the content
+          const contentSelectors = [
+            `[role="tabpanel"][value="${value}"]`,
+            `div[data-state][value="${value}"]`,
+            `[data-radix-tab-content][value="${value}"]`,
+            `[role="tabpanel"][data-value="${value}"]`,
+            `[data-state][data-orientation][value="${value}"]`,
+            `#${value}-content`, // Try by ID
+            `[data-tab-content="${value}"]` // Try by custom attribute
+          ];
+          
+          // Try each selector
+          let contentFound = false;
+          for (const selector of contentSelectors) {
+            const content = document.querySelector(selector);
+            if (content) {
+              console.log(`Found tab content with selector: ${selector}`);
+              contentFound = true;
+              (content as HTMLElement).setAttribute('data-state', 'active');
+              break;
+            }
           }
+          
+          // If still not found, look for TabsContent by searching TabsContent elements that match the value
+          if (!contentFound) {
+            // Search for any element that might be the content panel
+            const allPanels = document.querySelectorAll('[role="tabpanel"]');
+            for (const panel of Array.from(allPanels)) {
+              if ((panel as HTMLElement).getAttribute('value') === value) {
+                (panel as HTMLElement).setAttribute('data-state', 'active');
+                contentFound = true;
+                break;
+              }
+            }
+          }
+          
+          // One more try - look for elements inside [data-orientation="horizontal"] container
+          if (!contentFound) {
+            // Find the element directly from the TabsContent component
+            const contentElement = document.querySelector(`[data-state="inactive"][value="${value}"]`);
+            if (contentElement) {
+              (contentElement as HTMLElement).setAttribute('data-state', 'active');
+              contentFound = true;
+            }
+          }
+          
+          console.log(contentFound ? 'Tab content activated' : 'Could not find tab content');
         }
         return true;
       }
