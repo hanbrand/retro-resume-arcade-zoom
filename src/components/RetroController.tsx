@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import ControllerBody from './controller/ControllerBody';
 import { useControllerNavigation } from '@/hooks/useControllerNavigation';
 import { useControllerVisibility } from '@/hooks/useControllerVisibility';
@@ -19,23 +19,69 @@ const RetroController = () => {
   } = useControllerNavigation();
   const { isVisible } = useControllerVisibility(controllerRef);
   const initialized = useRef(false);
+  const [navigationDebug, setNavigationDebug] = useState<string>('');
 
   // Force select a tab programmatically (more direct than DOM click)
   const forceSelectTab = (tabName: string) => {
     console.log(`Forcing tab selection: ${tabName}`);
+    setNavigationDebug(`Attempting to select: ${tabName}`);
+    
     // Try direct context update first (most reliable)
     try {
       setCurrentSection(tabName);
+      setNavigationDebug(prev => `${prev}, Context updated`);
+      
+      // Direct DOM manipulation as backup to ensure UI syncs with state
+      const tabId = `${tabName}-tab`;
+      const tabElement = document.getElementById(tabId);
+      if (tabElement) {
+        // Manually trigger click and set attributes
+        tabElement.click();
+        tabElement.setAttribute('data-state', 'active');
+        tabElement.setAttribute('aria-selected', 'true');
+        setNavigationDebug(prev => `${prev}, DOM sync triggered`);
+      }
+      
       return true;
     } catch (error) {
       console.error("Error setting section via context:", error);
+      setNavigationDebug(prev => `${prev}, Context error`);
     }
 
     // Fallback to DOM manipulation
     try {
-      return navigateToTabByName(tabName);
+      const success = navigateToTabByName(tabName);
+      setNavigationDebug(prev => `${prev}, DOM navigation ${success ? 'succeeded' : 'failed'}`);
+      
+      // Super fallback: direct DOM access with ID
+      if (!success) {
+        const tabId = `${tabName}-tab`;
+        const tabElement = document.getElementById(tabId);
+        if (tabElement) {
+          setNavigationDebug(prev => `${prev}, Trying direct DOM access`);
+          try {
+            tabElement.click();
+            
+            // Manually update state if needed
+            setCurrentSection(tabName);
+            
+            // Set ARIA and data attributes as last resort
+            tabElement.setAttribute('data-state', 'active');
+            tabElement.setAttribute('aria-selected', 'true');
+            
+            setNavigationDebug(prev => `${prev}, Direct DOM manipulation succeeded`);
+            return true;
+          } catch (innerError) {
+            console.error("Error with direct DOM manipulation:", innerError);
+            setNavigationDebug(prev => `${prev}, Direct DOM error`);
+          }
+        }
+      }
+      
+      return success;
     } catch (error) {
       console.error("Error navigating to tab:", error);
+      setNavigationDebug(prev => `${prev}, DOM error`);
       return false;
     }
   };
@@ -43,11 +89,13 @@ const RetroController = () => {
   // Initialize aggressively on mount to ensure tabs are active immediately
   useEffect(() => {
     console.log("RetroController mounted, initializing navigation");
+    setNavigationDebug('Controller mounted');
 
     // Immediate initialization attempt
     if (!initialized.current) {
       // Pre-select the about tab or current section
       const initialTab = currentSection || 'about';
+      setNavigationDebug(prev => `${prev}, Initial tab: ${initialTab}`);
       
       // Try immediately
       let success = forceSelectTab(initialTab);
@@ -59,15 +107,18 @@ const RetroController = () => {
           setTimeout(() => {
             if (!initialized.current) {
               console.log(`Retry ${index + 1} for tab initialization`);
+              setNavigationDebug(prev => `${prev}, Retry ${index + 1}`);
               success = forceSelectTab(initialTab);
               if (success) {
                 initialized.current = true;
+                setNavigationDebug(prev => `${prev}, Initialized on retry ${index + 1}`);
               }
             }
           }, delay);
         });
       } else {
         initialized.current = true;
+        setNavigationDebug(prev => `${prev}, Initialized immediately`);
       }
     }
   }, [currentSection, navigateToTabByName, setCurrentSection]);
@@ -83,16 +134,19 @@ const RetroController = () => {
   // Enhanced handler for button clicks with direct tab setting
   const onButtonClick = (button: Button) => {
     console.log(`RetroController: Button clicked: ${button}`);
+    setNavigationDebug(`Button clicked: ${button}`);
     
     // Ensure we're initialized on first click
     if (!initialized.current) {
       forceSelectTab('about');
       initialized.current = true;
+      setNavigationDebug(prev => `${prev}, Forced initialization on button click`);
     }
     
     // If clicked a mapped button, force select the corresponding tab
     if (button && buttonToTabMap[button]) {
-      forceSelectTab(buttonToTabMap[button]);
+      const success = forceSelectTab(buttonToTabMap[button]);
+      setNavigationDebug(prev => `${prev}, Tab selection ${success ? 'succeeded' : 'failed'}`);
     }
     
     // Also call the original handler for state updates
@@ -102,11 +156,13 @@ const RetroController = () => {
   // Enhanced handler for D-pad clicks with direct tab navigation
   const onDirectionClick = (direction: Direction) => {
     console.log(`RetroController: Direction clicked: ${direction}`);
+    setNavigationDebug(`Direction clicked: ${direction}`);
     
     // Ensure we're initialized on first click
     if (!initialized.current) {
       forceSelectTab('about');
       initialized.current = true;
+      setNavigationDebug(prev => `${prev}, Forced initialization on direction click`);
     }
     
     // Handle left/right navigation directly
@@ -127,7 +183,8 @@ const RetroController = () => {
       }
       
       // Force select the new tab
-      forceSelectTab(tabValues[newIndex]);
+      const success = forceSelectTab(tabValues[newIndex]);
+      setNavigationDebug(prev => `${prev}, Tab selection to ${tabValues[newIndex]} ${success ? 'succeeded' : 'failed'}`);
     }
     
     // Also call the original handler for scrolling/state updates
@@ -143,9 +200,18 @@ const RetroController = () => {
         if (!initialized.current) {
           forceSelectTab('about');
           initialized.current = true;
+          setNavigationDebug(`Initialized on mouse enter`);
         }
       }}
     >
+      {/* Add debugging info, only visible during development */}
+      {process.env.NODE_ENV !== 'production' && (
+        <div className="absolute -top-24 left-0 right-0 p-2 bg-black/80 text-white text-xs max-w-xs mx-auto">
+          <div>Current Section: {currentSection}</div>
+          <div>Debug: {navigationDebug}</div>
+        </div>
+      )}
+      
       <ControllerBody 
         activeDirection={activeDirection}
         activeButton={activeButton}

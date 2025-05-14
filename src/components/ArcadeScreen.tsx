@@ -76,6 +76,8 @@ const ArcadeScreen = () => {
                       value="about"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-purple data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-purple/50`}
                       data-section="about"
+                      id="about-tab"
+                      data-tab="about"
                     >
                       <Gamepad size={16} />
                       <span className="hidden sm:inline">About</span>
@@ -84,6 +86,8 @@ const ArcadeScreen = () => {
                       value="skills"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-pink data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-pink/50`}
                       data-section="skills"
+                      id="skills-tab"
+                      data-tab="skills"
                     >
                       <Disc size={16} />
                       <span className="hidden sm:inline">Skills</span>
@@ -92,6 +96,8 @@ const ArcadeScreen = () => {
                       value="experience"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-cyan data-[state=active]:text-black bg-arcade-darkPurple text-white/70 border border-arcade-cyan/50`}
                       data-section="experience"
+                      id="experience-tab"
+                      data-tab="experience"
                     >
                       <Clock size={16} />
                       <span className="hidden sm:inline">Experience</span>
@@ -100,6 +106,8 @@ const ArcadeScreen = () => {
                       value="contact"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-orange data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-orange/50`}
                       data-section="contact"
+                      id="contact-tab"
+                      data-tab="contact"
                     >
                       <Headphones size={16} />
                       <span className="hidden sm:inline">Contact</span>

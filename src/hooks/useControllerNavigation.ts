@@ -11,51 +11,142 @@ export const useControllerNavigation = () => {
   const initAttempts = useRef(0);
   const tabsPollingInterval = useRef<number | null>(null);
   
-  // Function to click a button on an element
+  // Enhanced function to click an element - tries multiple reliable approaches
   const clickElement = (element: HTMLElement | null) => {
-    if (!element) return false;
+    if (!element) {
+      console.error('Cannot click null element');
+      return false;
+    }
     
-    try {
-      // Try using the native click method
-      element.click();
-      return true;
-    } catch (e) {
-      try {
-        // Fallback: create and dispatch a click event
-        const event = new MouseEvent('click', {
-          view: window,
-          bubbles: true,
-          cancelable: true
-        });
-        element.dispatchEvent(event);
+    console.log(`Attempting to click element: ${element.tagName} ${element.className}`);
+    
+    // Try a sequence of increasingly forceful click approaches
+    const clickMethods = [
+      // 1. Standard element.click() - most compatible
+      () => {
+        console.log('Trying native click()');
+        element.click();
         return true;
-      } catch (e2) {
-        console.error('Failed to click element', e2);
-        return false;
+      },
+      
+      // 2. Dispatch mousedown/mouseup/click events
+      () => {
+        console.log('Trying manual event dispatch sequence');
+        ['mousedown', 'mouseup', 'click'].forEach(eventType => {
+          const event = new MouseEvent(eventType, {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+            clientX: 0,
+            clientY: 0
+          });
+          element.dispatchEvent(event);
+        });
+        return true;
+      },
+      
+      // 3. Focus then click
+      () => {
+        console.log('Trying focus then click');
+        element.focus();
+        setTimeout(() => element.click(), 50);
+        return true;
+      },
+      
+      // 4. Set attribute directly (for Radix UI)
+      () => {
+        console.log('Trying to set data-state/aria-selected');
+        // For Radix UI tabs, setting these attributes might trigger state changes
+        element.setAttribute('data-state', 'active');
+        element.setAttribute('aria-selected', 'true');
+        
+        // Try to find and activate related content
+        const value = element.getAttribute('value');
+        if (value) {
+          const content = document.querySelector(`[data-state="inactive"][data-orientation="horizontal"][value="${value}"]`);
+          if (content) {
+            (content as HTMLElement).setAttribute('data-state', 'active');
+          }
+        }
+        return true;
+      }
+    ];
+    
+    // Try each method in sequence
+    for (const method of clickMethods) {
+      try {
+        if (method()) {
+          return true;
+        }
+      } catch (error) {
+        console.error('Click method failed:', error);
+        // Continue to next method
       }
     }
+    
+    console.error('All click methods failed');
+    return false;
   };
   
-  // Function to get all tabs - searching by actual DOM attributes
+  // Function to get all tabs - searching by actual DOM attributes with more robust selection
   const getAllTabs = useCallback(() => {
-    const tabs = document.querySelectorAll('[role="tab"]');
-    console.log(`Found ${tabs.length} tabs`);
-    return tabs;
-  }, []);
-  
-  // Function to get the currently active tab
-  const getActiveTab = useCallback(() => {
-    const activeTab = document.querySelector('[role="tab"][data-state="active"], [role="tab"][aria-selected="true"]');
-    if (activeTab) {
-      console.log(`Active tab: ${activeTab.textContent}`);
-    } else {
-      console.log("No active tab found");
+    // Try multiple selectors to find tabs in various UI libraries
+    const selectors = [
+      '[role="tab"]',
+      '[data-state][value]',
+      '.tabs-trigger',
+      '[data-radix-collection-item]'
+    ];
+    
+    // Use the first selector that returns elements
+    for (const selector of selectors) {
+      const tabs = document.querySelectorAll(selector);
+      if (tabs.length > 0) {
+        console.log(`Found ${tabs.length} tabs using selector: ${selector}`);
+        return tabs;
+      }
     }
-    return activeTab;
+    
+    console.log('No tabs found with any selector');
+    return document.querySelectorAll('[role="tab"]'); // Fallback to standard
   }, []);
   
-  // Function to try clicking a specific tab value
+  // Function to get the currently active tab with enhanced detection
+  const getActiveTab = useCallback(() => {
+    // Try multiple selectors to find the active tab
+    const selectors = [
+      '[role="tab"][data-state="active"]', 
+      '[role="tab"][aria-selected="true"]',
+      '[data-state="active"][value]',
+      '.tabs-trigger[data-active="true"]'
+    ];
+    
+    // Use the first selector that returns an element
+    for (const selector of selectors) {
+      const activeTab = document.querySelector(selector);
+      if (activeTab) {
+        console.log(`Active tab found with selector: ${selector}`);
+        return activeTab;
+      }
+    }
+    
+    console.log("No active tab found with any selector");
+    return null;
+  }, []);
+  
+  // Function to try clicking a specific tab value with enhanced methods
   const clickTabByValue = useCallback((tabValue: string) => {
+    console.log(`Attempting to click tab with value: ${tabValue}`);
+    
+    // Try using ID selector first (most reliable now that we've added IDs)
+    const idSelector = `#${tabValue}-tab`;
+    const tabById = document.querySelector(idSelector) as HTMLElement;
+    
+    if (tabById) {
+      console.log(`Found tab with ID selector: ${idSelector}`);
+      return clickElement(tabById);
+    }
+    
     // Handle specific tab values that might have different text
     const valueMap: Record<string, string[]> = {
       'about': ['about', 'purple', 'gamepad'],
@@ -67,61 +158,74 @@ export const useControllerNavigation = () => {
     // Try multiple potential text values for the tab
     const possibleValues = valueMap[tabValue] || [tabValue];
     
-    // Try to find the tab with the attribute value first (most reliable)
-    let targetTab = document.querySelector(`[role="tab"][value="${tabValue}"]`) as HTMLElement;
-    
-    // If not found by attribute, try by other attributes
-    if (!targetTab) {
-      targetTab = document.querySelector(`[role="tab"][data-section="${tabValue}"]`) as HTMLElement;
-    }
-    
-    // If still not found, try by text content or class
-    if (!targetTab) {
-      const allTabs = document.querySelectorAll('[role="tab"]');
+    // Try increasingly broader selectors to find the tab
+    const selectorAttempts = [
+      // Data attributes (added specifically for controller navigation)
+      `[data-tab="${tabValue}"]`,
       
-      allTabs.forEach((tab) => {
-        const tabText = tab.textContent?.toLowerCase() || '';
-        const tabClasses = (tab as HTMLElement).className || '';
-        
-        // Check if any of the possible values are in the text or class
-        for (const val of possibleValues) {
-          if (tabText.includes(val.toLowerCase()) || tabClasses.includes(val.toLowerCase())) {
-            targetTab = tab as HTMLElement;
-            break;
-          }
+      // Exact value match
+      `[role="tab"][value="${tabValue}"]`,
+      `[data-section="${tabValue}"]`,
+      `[data-value="${tabValue}"]`,
+      
+      // Data state or orientation with value
+      `[data-state][value="${tabValue}"]`,
+      
+      // Class-based selectors
+      `.${tabValue}-tab`,
+      `.tab-${tabValue}`
+    ];
+    
+    // Try each selector in sequence
+    for (const selector of selectorAttempts) {
+      const targetTab = document.querySelector(selector) as HTMLElement;
+      if (targetTab) {
+        console.log(`Found tab with selector: ${selector}`);
+        return clickElement(targetTab);
+      }
+    }
+    
+    // If not found by direct selectors, try by content or class
+    const allTabs = getAllTabs();
+    for (const tab of Array.from(allTabs)) {
+      const tabElement = tab as HTMLElement;
+      const tabText = tabElement.textContent?.toLowerCase() || '';
+      const tabClasses = tabElement.className || '';
+      
+      // Check if any of the possible values are in the text or class
+      for (const val of possibleValues) {
+        if (tabText.includes(val.toLowerCase()) || tabClasses.includes(val.toLowerCase())) {
+          console.log(`Found tab by text/class match: ${val}`);
+          return clickElement(tabElement);
         }
-      });
+      }
     }
     
-    // If we found a tab, click it
-    if (targetTab) {
-      console.log(`Clicking tab with text: ${targetTab.textContent}`);
-      return clickElement(targetTab);
-    }
-    
+    console.log(`Could not find tab with value: ${tabValue}`);
     return false;
-  }, []);
+  }, [getAllTabs]);
   
-  // Function to activate a tab by its value attribute or text content
+  // Function to activate a tab by its value or text content
   const navigateToTabByName = useCallback((tabName: string) => {
     console.log(`Attempting to navigate to tab: ${tabName}`);
     
-    // Try to click the tab by different strategies
+    // Try to click the tab with enhanced methods
     if (clickTabByValue(tabName)) {
       return true;
     }
     
-    // Fallback approach: try clicking first tab if we couldn't find the target
+    // Fallback: try clicking first tab if we couldn't find the target
     const tabs = getAllTabs();
     if (tabs.length > 0) {
       console.log("Falling back to first tab");
       return clickElement(tabs[0] as HTMLElement);
     }
     
+    console.error(`Failed to navigate to tab: ${tabName}`);
     return false;
   }, [clickTabByValue, getAllTabs]);
   
-  // Function to navigate between tabs
+  // Navigation between tabs with improved tab finding and clicking
   const navigateTabs = useCallback((direction: 'next' | 'prev') => {
     console.log(`Navigating tabs: ${direction}`);
     const tabs = getAllTabs();
@@ -334,7 +438,7 @@ export const useControllerNavigation = () => {
     };
   }, [lastScrollPosition, navigateTabs, navigateToTabByName, isInitialized, ensureTabsInitialized]);
 
-  // Function to handle D-pad button click
+  // Function to handle D-pad button click with improved navigation
   const handleDPadClick = (direction: Direction) => {
     console.log(`D-pad clicked: ${direction}`);
     setActiveDirection(direction);
