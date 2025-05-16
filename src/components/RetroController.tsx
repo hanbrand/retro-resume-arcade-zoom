@@ -22,7 +22,7 @@ const RetroController = () => {
     setActiveButton
   } = useControllerNavigation();
   const { isVisible } = useControllerVisibility(controllerRef);
-  const [initialized, setInitialized] = useState(false);
+  const initialized = useRef(false);
 
   // Map for button to tab values
   const buttonToTabMap: Record<string, string> = {
@@ -34,16 +34,17 @@ const RetroController = () => {
 
   // Initialize on mount - ensure a tab is selected
   useEffect(() => {
-    if (!initialized) {
-      // Default to 'about' if no valid section is selected
+    if (!initialized.current) {
       if (!TAB_VALUES.includes(currentSection)) {
         setTab('about');
       } else {
         setTab(currentSection);
       }
-      setInitialized(true);
+      initialized.current = true;
     }
-  }, [currentSection, initialized, setTab]);
+    // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Enhanced handler for D-pad clicks with direct tab navigation
   const onDirectionClick = (direction: Direction) => {
@@ -123,10 +124,10 @@ const RetroController = () => {
       className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-20'}`}
       onMouseEnter={() => {
         // Make sure navigation is initialized on hover
-        if (!initialized) {
+        if (!initialized.current) {
           const initialTab = TAB_VALUES.includes(currentSection) ? currentSection : 'about';
           setTab(initialTab);
-          setInitialized(true);
+          initialized.current = true;
         }
       }}
     >
