@@ -11,7 +11,7 @@ const TAB_VALUES = ['about', 'skills', 'experience', 'contact'];
 
 const RetroController = () => {
   const controllerRef = useRef<HTMLDivElement>(null);
-  const { currentSection, setCurrentSection, focusTab } = useNavigation();
+  const { currentSection, setTab } = useNavigation();
   const { 
     activeDirection, 
     activeButton, 
@@ -37,15 +37,13 @@ const RetroController = () => {
     if (!initialized) {
       // Default to 'about' if no valid section is selected
       if (!TAB_VALUES.includes(currentSection)) {
-        setCurrentSection('about');
-        focusTab('about-tab');
+        setTab('about');
       } else {
-        // Ensure the current section is properly focused
-        focusTab(`${currentSection}-tab`);
+        setTab(currentSection);
       }
       setInitialized(true);
     }
-  }, [currentSection, initialized, setCurrentSection, focusTab]);
+  }, [currentSection, initialized, setTab]);
 
   // Enhanced handler for D-pad clicks with direct tab navigation
   const onDirectionClick = (direction: Direction) => {
@@ -61,10 +59,7 @@ const RetroController = () => {
         const newIndex = direction === 'left'
           ? (currentIndex - 1 + TAB_VALUES.length) % TAB_VALUES.length
           : (currentIndex + 1) % TAB_VALUES.length;
-        
-        const newTab = TAB_VALUES[newIndex];
-        setCurrentSection(newTab);
-        focusTab(`${newTab}-tab`);
+        setTab(TAB_VALUES[newIndex]);
       }
     }
   };
@@ -76,9 +71,7 @@ const RetroController = () => {
     
     // If clicked a mapped button, navigate to the corresponding tab
     if (button && buttonToTabMap[button]) {
-      const tabName = buttonToTabMap[button];
-      setCurrentSection(tabName);
-      focusTab(`${tabName}-tab`);
+      setTab(buttonToTabMap[button]);
     }
   };
 
@@ -132,8 +125,7 @@ const RetroController = () => {
         // Make sure navigation is initialized on hover
         if (!initialized) {
           const initialTab = TAB_VALUES.includes(currentSection) ? currentSection : 'about';
-          setCurrentSection(initialTab);
-          focusTab(`${initialTab}-tab`);
+          setTab(initialTab);
           setInitialized(true);
         }
       }}

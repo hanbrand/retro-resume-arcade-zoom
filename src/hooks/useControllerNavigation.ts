@@ -16,18 +16,18 @@ export const useControllerNavigation = () => {
       
       // Only update direction if there's a significant change
       if (Math.abs(currentScroll - lastScrollPosition) > 10) {
-        if (currentScroll > lastScrollPosition) {
-          setActiveDirection('down');
-        } else if (currentScroll < lastScrollPosition) {
-          setActiveDirection('up');
-        }
+      if (currentScroll > lastScrollPosition) {
+        setActiveDirection('down');
+      } else if (currentScroll < lastScrollPosition) {
+        setActiveDirection('up');
+      }
         
-        setLastScrollPosition(currentScroll);
+      setLastScrollPosition(currentScroll);
 
-        // Reset direction after a short delay
+      // Reset direction after a short delay
         const timer = setTimeout(() => {
-          setActiveDirection('neutral');
-        }, 150);
+        setActiveDirection('neutral');
+      }, 150);
         
         return () => clearTimeout(timer);
       }

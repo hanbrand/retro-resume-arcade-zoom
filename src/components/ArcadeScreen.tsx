@@ -10,15 +10,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // Defined context interface for better type safety
 interface NavigationContextType {
   currentSection: string;
-  setCurrentSection: (section: string) => void;
-  focusTab: (tabId: string) => void;
+  setTab: (section: string) => void;
 }
 
 // Create a context with a default value
 export const NavigationContext = createContext<NavigationContextType>({
   currentSection: "about",
-  setCurrentSection: () => {},
-  focusTab: () => {},
+  setTab: () => {},
 });
 
 // Custom hook to use the navigation context
@@ -35,34 +33,6 @@ const ArcadeScreen = () => {
     contact: null
   });
 
-  // Initialize tabs and focus handling
-  useEffect(() => {
-    // Simulate loading time for the retro effect
-    const timer = setTimeout(() => {
-      setLoaded(true);
-      
-      // Once loaded, initialize tab references
-      setTimeout(() => {
-        // Get references to all tab elements
-        tabsRefs.current = {
-          about: document.getElementById('about-tab'),
-          skills: document.getElementById('skills-tab'),
-          experience: document.getElementById('experience-tab'),
-          contact: document.getElementById('contact-tab')
-        };
-        
-        // Click the about tab to initialize it
-        const aboutTab = tabsRefs.current.about;
-        if (aboutTab) {
-          aboutTab.click();
-          aboutTab.focus();
-        }
-      }, 300);
-    }, 800);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   // Function to explicitly focus a specific tab by id
   const focusTab = (tabId: string) => {
     const tabElement = document.getElementById(tabId);
@@ -74,15 +44,12 @@ const ArcadeScreen = () => {
     }
   };
 
-  // Explicit handler for tab changes
-  const handleTabChange = (value: string) => {
+  // Unified tab change logic
+  const setTab = (value: string) => {
     setCurrentSection(value);
-    
-    // Ensure proper focus management for keyboard navigation
     setTimeout(() => {
       const tabId = `${value}-tab`;
       focusTab(tabId);
-      
       // Also scroll the content into view if needed
       const contentElement = document.getElementById(`${value}-content`);
       if (contentElement) {
@@ -91,11 +58,39 @@ const ArcadeScreen = () => {
     }, 10);
   };
 
-  // Context value with memoization to prevent unnecessary re-renders
+  // Initialize tabs and focus handling
+  useEffect(() => {
+    // Simulate loading time for the retro effect
+    const timer = setTimeout(() => {
+      setLoaded(true);
+      // Once loaded, initialize tab references
+      setTimeout(() => {
+        tabsRefs.current = {
+          about: document.getElementById('about-tab'),
+          skills: document.getElementById('skills-tab'),
+          experience: document.getElementById('experience-tab'),
+          contact: document.getElementById('contact-tab')
+        };
+        // Click the about tab to initialize it
+        const aboutTab = tabsRefs.current.about;
+        if (aboutTab) {
+          aboutTab.click();
+          aboutTab.focus();
+        }
+      }, 300);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handler for tab changes from UI
+  const handleTabChange = (value: string) => {
+    setTab(value);
+  };
+
+  // Context value
   const navigationContextValue = {
     currentSection,
-    setCurrentSection,
-    focusTab
+    setTab
   };
 
   return (
@@ -105,7 +100,6 @@ const ArcadeScreen = () => {
         <div className="absolute inset-0 pointer-events-none crt z-10">
           <div className="scanline"></div>
         </div>
-
         {/* Content container */}
         <div className="relative w-full max-w-5xl px-4 py-8 z-0">
           {!loaded ? (
@@ -124,7 +118,6 @@ const ArcadeScreen = () => {
                 <h1 className="text-2xl md:text-4xl font-press-start neon-text mb-2">BRANDON HAN</h1>
                 <p className="text-sm md:text-base font-vt323 text-arcade-cyan">RESEARCH LAB MANAGER & ASPIRING ML ENGINEER</p>
               </div>
-
               {/* Main content */}
               <Tabs 
                 value={currentSection} 
@@ -189,7 +182,6 @@ const ArcadeScreen = () => {
                     </TabsTrigger>
                   </TabsList>
                 </div>
-
                 <div className="border-2 border-arcade-cyan/50 rounded-md p-4 bg-black/40 backdrop-blur min-h-[50vh]">
                   <TabsContent 
                     value="about" 

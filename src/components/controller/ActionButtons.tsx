@@ -1,6 +1,5 @@
 import { Gamepad, Headphones, Disc, Clock } from 'lucide-react';
 import { Button } from '@/components/controller/types';
-import { useCallback, useEffect } from 'react';
 
 interface ActionButtonsProps {
   activeButton: Button;
@@ -12,43 +11,6 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
   const handleClick = (button: Button) => {
     onButtonClick(button);
   };
-
-  // Memoize click handlers with proper dependencies to prevent stale closures
-  const onButtonClickMemoized = useCallback((button: Button) => {
-    // Always call the original handler first for visual feedback
-    handleClick(button);
-    
-    // If clicked a mapped button, navigate to the corresponding tab
-    if (button && buttonToTabMap[button]) {
-      const tabName = buttonToTabMap[button];
-      setCurrentSection(tabName);
-      focusTab(`${tabName}-tab`);
-    }
-  }, [handleClick, setCurrentSection, focusTab]);
-
-  // Update keyboard event dependency array to include ALL needed functions
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Handle button presses
-      const buttonKey = e.key.toLowerCase();
-      if (['a', 'b', 'x', 'y'].includes(buttonKey)) {
-        onButtonClickMemoized(buttonKey as Button);
-      }
-    };
-    
-    const handleKeyUp = () => {
-      // Reset active states
-      onButtonClickMemoized(null);
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [onButtonClickMemoized]); // Add ALL dependencies
 
   return (
     <div className="absolute right-6 top-1/2 -translate-y-1/2 w-24 h-24 bg-gray-500 rounded-full flex items-center justify-center">
