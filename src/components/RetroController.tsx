@@ -1,27 +1,28 @@
-import { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import ControllerBody from './controller/ControllerBody';
 import { useControllerNavigation } from '@/hooks/useControllerNavigation';
 import { useControllerVisibility } from '@/hooks/useControllerVisibility';
 import { Direction } from './controller/DPad';
 import { Button } from './controller/types';
-import { useNavigation } from './ArcadeScreen'; // Import for direct tab control
+import { useNavigation } from './ArcadeScreen';
 
 // Define tab order for consistent navigation
 const TAB_VALUES = ['about', 'skills', 'experience', 'contact'];
 
 const RetroController = () => {
   const controllerRef = useRef<HTMLDivElement>(null);
-  const { currentSection, setCurrentSection } = useNavigation(); // Get navigation context
+  const { currentSection, setCurrentSection, focusTab } = useNavigation();
   const { 
     activeDirection, 
     activeButton, 
     keyPressed, 
     handleDPadClick: originalHandleDPadClick,
-    handleButtonClick: originalHandleButtonClick
+    handleButtonClick: originalHandleButtonClick,
+    setActiveDirection,
+    setActiveButton
   } = useControllerNavigation();
   const { isVisible } = useControllerVisibility(controllerRef);
-  const initialized = useRef(false);
-  const [navigationDebug, setNavigationDebug] = useState<string>('');
+  const [initialized, setInitialized] = useState(false);
 
   // Map for button to tab values
   const buttonToTabMap: Record<string, string> = {
@@ -31,125 +32,112 @@ const RetroController = () => {
     'y': 'experience'
   };
 
-  // Programmatically click the tab element
-  const clickTabElement = (tabValue: string) => {
-    const tabId = `${tabValue}-tab`;
-    const tabElement = document.getElementById(tabId);
-    if (tabElement) {
-      // Use the actual DOM click method to trigger the tab
-      tabElement.click();
-      return true;
-    }
-    return false;
-  };
-
-  // Simple initialization to ensure a tab is selected on mount
+  // Initialize on mount - ensure a tab is selected
   useEffect(() => {
-    console.log("RetroController mounted, initializing navigation");
-    setNavigationDebug('Controller mounted');
-
-    if (!initialized.current) {
-      initialized.current = true;
-      // Only set the section if it's not already set
+    if (!initialized) {
+      // Default to 'about' if no valid section is selected
       if (!TAB_VALUES.includes(currentSection)) {
-        // Set state AND click the DOM element
         setCurrentSection('about');
-        setTimeout(() => clickTabElement('about'), 100);
-        setNavigationDebug('Initialized to about tab');
+        focusTab('about-tab');
+      } else {
+        // Ensure the current section is properly focused
+        focusTab(`${currentSection}-tab`);
       }
+      setInitialized(true);
     }
-  }, [currentSection, setCurrentSection]);
+  }, [currentSection, initialized, setCurrentSection, focusTab]);
 
   // Enhanced handler for D-pad clicks with direct tab navigation
   const onDirectionClick = (direction: Direction) => {
-    console.log(`RetroController: Direction clicked: ${direction}`);
-    setNavigationDebug(`Direction clicked: ${direction}`);
+    // Always call the original handler first for visual feedback
+    originalHandleDPadClick(direction);
     
     // For left/right, navigate between tabs
     if (direction === 'left' || direction === 'right') {
       // Find current position in tab order
       const currentIndex = TAB_VALUES.indexOf(currentSection);
       if (currentIndex !== -1) {
-        // Calculate next tab index
+        // Calculate next tab index with wrap-around
         const newIndex = direction === 'left'
           ? (currentIndex - 1 + TAB_VALUES.length) % TAB_VALUES.length
           : (currentIndex + 1) % TAB_VALUES.length;
         
         const newTab = TAB_VALUES[newIndex];
-        
-        // Update state AND programmatically click the tab
         setCurrentSection(newTab);
-        setTimeout(() => clickTabElement(newTab), 10);
-        setNavigationDebug(`Navigated to ${newTab}`);
+        focusTab(`${newTab}-tab`);
       }
     }
-    
-    // Call original handler for other actions (scroll up/down)
-    originalHandleDPadClick(direction);
   };
 
-  // Enhanced handler for button clicks with direct tab setting
+  // Enhanced handler for button clicks
   const onButtonClick = (button: Button) => {
-    console.log(`RetroController: Button clicked: ${button}`);
-    setNavigationDebug(`Button clicked: ${button}`);
+    // Always call the original handler first for visual feedback
+    originalHandleButtonClick(button);
     
-    // If clicked a mapped button, change to the corresponding tab
+    // If clicked a mapped button, navigate to the corresponding tab
     if (button && buttonToTabMap[button]) {
       const tabName = buttonToTabMap[button];
-      
-      // Update state AND programmatically click the tab
       setCurrentSection(tabName);
-      setTimeout(() => clickTabElement(tabName), 10);
-      setNavigationDebug(`Activated ${tabName} tab`);
+      focusTab(`${tabName}-tab`);
     }
-    
-    // Call original handler for state updates
-    originalHandleButtonClick(button);
   };
 
-  // Manually focus the active tab when keyboard events occur
+  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (['ArrowLeft', 'ArrowRight', 'a', 'b', 'x', 'y', 'A', 'B', 'X', 'Y'].includes(e.key)) {
-        // Ensure we have focus on the tab container for keyboard navigation to work
-        const tabsList = document.querySelector('[role="tablist"]');
-        if (tabsList) {
-          (tabsList as HTMLElement).focus();
-        }
+      // Update direction based on arrow keys
+      if (e.key === 'ArrowLeft') {
+        setActiveDirection('left');
+        onDirectionClick('left');
+      } else if (e.key === 'ArrowRight') {
+        setActiveDirection('right');
+        onDirectionClick('right');
+      } else if (e.key === 'ArrowUp') {
+        setActiveDirection('up');
+        onDirectionClick('up');
+      } else if (e.key === 'ArrowDown') {
+        setActiveDirection('down');
+        onDirectionClick('down');
+      }
+      
+      // Handle button presses
+      const buttonKey = e.key.toLowerCase();
+      if (['a', 'b', 'x', 'y'].includes(buttonKey)) {
+        setActiveButton(buttonKey as Button);
+        onButtonClick(buttonKey as Button);
       }
     };
     
+    const handleKeyUp = () => {
+      // Reset active states
+      setActiveDirection('neutral');
+      setActiveButton(null);
+    };
+    
+    // Add event listeners
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
     
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [currentSection]); // Re-attach when current section changes
 
   return (
     <div 
       ref={controllerRef} 
       className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-20'}`}
       onMouseEnter={() => {
-        // Ensure tabs are initialized when mouse hovers over controller
-        if (!initialized.current) {
-          initialized.current = true;
-          if (!TAB_VALUES.includes(currentSection)) {
-            setCurrentSection('about');
-            setTimeout(() => clickTabElement('about'), 100);
-          }
-          setNavigationDebug(`Initialized on mouse enter`);
+        // Make sure navigation is initialized on hover
+        if (!initialized) {
+          const initialTab = TAB_VALUES.includes(currentSection) ? currentSection : 'about';
+          setCurrentSection(initialTab);
+          focusTab(`${initialTab}-tab`);
+          setInitialized(true);
         }
       }}
     >
-      {/* Add debugging info, only visible during development */}
-      {process.env.NODE_ENV !== 'production' && (
-        <div className="absolute -top-24 left-0 right-0 p-2 bg-black/80 text-white text-xs max-w-xs mx-auto">
-          <div>Current Section: {currentSection}</div>
-          <div>Debug: {navigationDebug}</div>
-        </div>
-      )}
-      
       <ControllerBody 
         activeDirection={activeDirection}
         activeButton={activeButton}

@@ -7,10 +7,18 @@ import ProjectsSection from './ProjectsSection';
 import ContactSection from './ContactSection';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// Create a context to share the current section across components
-export const NavigationContext = createContext({
+// Defined context interface for better type safety
+interface NavigationContextType {
+  currentSection: string;
+  setCurrentSection: (section: string) => void;
+  focusTab: (tabId: string) => void;
+}
+
+// Create a context with a default value
+export const NavigationContext = createContext<NavigationContextType>({
   currentSection: "about",
-  setCurrentSection: (section: string) => {},
+  setCurrentSection: () => {},
+  focusTab: () => {},
 });
 
 // Custom hook to use the navigation context
@@ -20,63 +28,78 @@ const ArcadeScreen = () => {
   const [loaded, setLoaded] = useState(false);
   const [currentSection, setCurrentSection] = useState("about");
   const tabsListRef = useRef<HTMLDivElement>(null);
+  const tabsRefs = useRef<Record<string, HTMLElement | null>>({
+    about: null,
+    skills: null,
+    experience: null,
+    contact: null
+  });
 
+  // Initialize tabs and focus handling
   useEffect(() => {
     // Simulate loading time for the retro effect
     const timer = setTimeout(() => {
       setLoaded(true);
       
-      // Once loaded, make sure the tabs are focused for keyboard navigation
+      // Once loaded, initialize tab references
       setTimeout(() => {
-        const activeTab = document.querySelector('[role="tab"][data-state="active"]');
-        if (activeTab) {
-          (activeTab as HTMLElement).focus();
+        // Get references to all tab elements
+        tabsRefs.current = {
+          about: document.getElementById('about-tab'),
+          skills: document.getElementById('skills-tab'),
+          experience: document.getElementById('experience-tab'),
+          contact: document.getElementById('contact-tab')
+        };
+        
+        // Click the about tab to initialize it
+        const aboutTab = tabsRefs.current.about;
+        if (aboutTab) {
+          aboutTab.click();
+          aboutTab.focus();
         }
-      }, 500);
-    }, 1000);
-
-    console.log("ArcadeScreen mounted - current section:", currentSection);
+      }, 300);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // Log section changes
-  useEffect(() => {
-    console.log("Section changed to:", currentSection);
-  }, [currentSection]);
+  // Function to explicitly focus a specific tab by id
+  const focusTab = (tabId: string) => {
+    const tabElement = document.getElementById(tabId);
+    if (tabElement) {
+      tabElement.click();
+      setTimeout(() => {
+        tabElement.focus();
+      }, 10);
+    }
+  };
 
-  // Explicit handler for tab changes to help with debugging
+  // Explicit handler for tab changes
   const handleTabChange = (value: string) => {
-    console.log(`Tab changed to: ${value}`);
     setCurrentSection(value);
     
-    // When tab changes, ensure proper focus management for keyboard navigation
+    // Ensure proper focus management for keyboard navigation
     setTimeout(() => {
-      const activeTab = document.querySelector(`[role="tab"][value="${value}"]`);
-      if (activeTab) {
-        (activeTab as HTMLElement).focus();
+      const tabId = `${value}-tab`;
+      focusTab(tabId);
+      
+      // Also scroll the content into view if needed
+      const contentElement = document.getElementById(`${value}-content`);
+      if (contentElement) {
+        contentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }, 10);
   };
 
-  // Add a focus handler to improve keyboard accessibility
-  const handleTabsListFocus = () => {
-    console.log("TabsList focused");
-    // Ensure an active tab is selected when tabList gets focus
-    const activeTab = document.querySelector('[role="tab"][data-state="active"]');
-    if (activeTab) {
-      (activeTab as HTMLElement).focus();
-    } else {
-      // If no active tab, focus the first one
-      const firstTab = document.querySelector('[role="tab"]');
-      if (firstTab) {
-        (firstTab as HTMLElement).focus();
-      }
-    }
+  // Context value with memoization to prevent unnecessary re-renders
+  const navigationContextValue = {
+    currentSection,
+    setCurrentSection,
+    focusTab
   };
 
   return (
-    <NavigationContext.Provider value={{ currentSection, setCurrentSection }}>
+    <NavigationContext.Provider value={navigationContextValue}>
       <div className="relative w-full min-h-screen flex flex-col items-center bg-arcade-darkPurple overflow-x-hidden">
         {/* CRT overlay effect */}
         <div className="absolute inset-0 pointer-events-none crt z-10">
@@ -107,19 +130,22 @@ const ArcadeScreen = () => {
                 value={currentSection} 
                 onValueChange={handleTabChange} 
                 className="w-full"
+                defaultValue="about"
               >
                 <div className="border-2 border-arcade-neonPink/50 rounded-md p-3 mb-8 bg-black/40 backdrop-blur">
                   <TabsList 
                     className="grid grid-cols-2 md:grid-cols-4 bg-transparent gap-2"
                     ref={tabsListRef}
-                    onFocus={handleTabsListFocus}
-                    tabIndex={0}
+                    role="tablist"
+                    aria-label="Resume Sections"
                   >
                     <TabsTrigger
                       value="about"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-purple data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-purple/50`}
-                      data-section="about"
                       id="about-tab"
+                      role="tab"
+                      aria-controls="about-content"
+                      aria-selected={currentSection === "about"}
                       data-tab="about"
                     >
                       <Gamepad size={16} />
@@ -128,8 +154,10 @@ const ArcadeScreen = () => {
                     <TabsTrigger
                       value="skills"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-pink data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-pink/50`}
-                      data-section="skills"
                       id="skills-tab"
+                      role="tab"
+                      aria-controls="skills-content"
+                      aria-selected={currentSection === "skills"}
                       data-tab="skills"
                     >
                       <Disc size={16} />
@@ -138,8 +166,10 @@ const ArcadeScreen = () => {
                     <TabsTrigger
                       value="experience"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-cyan data-[state=active]:text-black bg-arcade-darkPurple text-white/70 border border-arcade-cyan/50`}
-                      data-section="experience"
                       id="experience-tab"
+                      role="tab"
+                      aria-controls="experience-content"
+                      aria-selected={currentSection === "experience"}
                       data-tab="experience"
                     >
                       <Clock size={16} />
@@ -148,8 +178,10 @@ const ArcadeScreen = () => {
                     <TabsTrigger
                       value="contact"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-orange data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-orange/50`}
-                      data-section="contact"
                       id="contact-tab"
+                      role="tab"
+                      aria-controls="contact-content"
+                      aria-selected={currentSection === "contact"}
                       data-tab="contact"
                     >
                       <Headphones size={16} />
@@ -161,9 +193,11 @@ const ArcadeScreen = () => {
                 <div className="border-2 border-arcade-cyan/50 rounded-md p-4 bg-black/40 backdrop-blur min-h-[50vh]">
                   <TabsContent 
                     value="about" 
-                    className="mt-0"
+                    className="mt-0 focus-visible:outline-none"
                     id="about-content"
-                    data-tab-content="about"
+                    role="tabpanel"
+                    aria-labelledby="about-tab"
+                    tabIndex={0}
                   >
                     <div className="text-white font-vt323 space-y-4">
                       <h2 className="text-2xl font-press-start text-arcade-cyan mb-4">ABOUT ME</h2>
@@ -212,34 +246,48 @@ const ArcadeScreen = () => {
                       
                       <div className="mt-8 p-4 border border-arcade-purple/30 rounded-md bg-gradient-to-r from-arcade-darkPurple to-black">
                         <h3 className="text-arcade-purple font-press-start text-sm mb-2">GAME CONTROLS</h3>
-                        <p>Use the controller at the bottom of the screen or keyboard arrow keys to navigate through my resume. Press 'A' to select or 'B' to go back.</p>
+                        <p>Use the controller at the bottom of the screen or keyboard arrow keys to navigate through my resume.</p>
+                        <ul className="mt-2 text-sm">
+                          <li><span className="text-arcade-purple">Purple Button (A)</span>: About tab</li>
+                          <li><span className="text-arcade-pink">Pink Button (X)</span>: Skills tab</li>
+                          <li><span className="text-arcade-cyan">Cyan Button (Y)</span>: Experience tab</li>
+                          <li><span className="text-arcade-orange">Orange Button (B)</span>: Contact tab</li>
+                          <li><span className="text-white">D-pad Left/Right</span>: Navigate between tabs</li>
+                          <li><span className="text-white">D-pad Up/Down</span>: Scroll content</li>
+                        </ul>
                       </div>
                     </div>
                   </TabsContent>
 
                   <TabsContent 
                     value="skills" 
-                    className="mt-0"
+                    className="mt-0 focus-visible:outline-none"
                     id="skills-content"
-                    data-tab-content="skills"
+                    role="tabpanel"
+                    aria-labelledby="skills-tab"
+                    tabIndex={0}
                   >
                     <SkillsSection />
                   </TabsContent>
 
                   <TabsContent 
                     value="experience" 
-                    className="mt-0"
+                    className="mt-0 focus-visible:outline-none"
                     id="experience-content"
-                    data-tab-content="experience"
+                    role="tabpanel"
+                    aria-labelledby="experience-tab"
+                    tabIndex={0}
                   >
                     <ExperienceSection />
                   </TabsContent>
 
                   <TabsContent 
                     value="contact" 
-                    className="mt-0"
+                    className="mt-0 focus-visible:outline-none"
                     id="contact-content"
-                    data-tab-content="contact"
+                    role="tabpanel"
+                    aria-labelledby="contact-tab"
+                    tabIndex={0}
                   >
                     <ContactSection />
                   </TabsContent>
