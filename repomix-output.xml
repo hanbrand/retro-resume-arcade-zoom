@@ -6986,67 +6986,6 @@ const Index = () => {
 export default Index;
 </file>
 
-<file path="src/components/controller/ControllerBody.tsx">
-import React from 'react';
-import DPad from './DPad';
-import ActionButtons from './ActionButtons';
-import { Direction } from './DPad';
-import { Button } from './types';
-
-interface ControllerBodyProps {
-  activeDirection: Direction;
-  activeButton: Button;
-  keyPressed: string | null;
-  onDirectionClick: (direction: Direction) => void;
-  onButtonClick: (button: Button) => void;
-}
-
-const ControllerBody = ({ 
-  activeDirection, 
-  activeButton, 
-  keyPressed,
-  onDirectionClick,
-  onButtonClick
-}: ControllerBodyProps) => {
-  return (
-    <div className="relative w-80 h-40 bg-gray-200 rounded-full px-4 shadow-2xl">
-      {/* Controller Body with rounded edges */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-100 to-gray-300 rounded-[40px] shadow-inner border border-gray-400"></div>
-
-      {/* D-pad */}
-      <DPad 
-        activeDirection={activeDirection} 
-        keyPressed={keyPressed} 
-        onDirectionClick={onDirectionClick} 
-      />
-      
-      {/* Center area with select/start buttons */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-        <div className="w-24 h-8 flex justify-between items-center transform rotate-[-20deg]">
-          <div className="w-10 h-3 bg-gray-600 rounded-md"></div>
-          <div className="w-10 h-3 bg-gray-600 rounded-md"></div>
-        </div>
-        <div className="mt-8 flex justify-center space-x-2">
-          <div className="text-[8px] text-arcade-pink font-press-start">SELECT</div>
-          <div className="text-[8px] text-arcade-pink font-press-start">START</div>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <ActionButtons activeButton={activeButton} onButtonClick={onButtonClick} />
-
-      {/* Instruction label with button mappings */}
-      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-xs text-arcade-pink/80 font-vt323 flex flex-col items-center">
-        <div className="whitespace-nowrap">Left/Right = Navigate Tabs | Up/Down = Scroll</div>
-        <div className="whitespace-nowrap mt-1">Purple = About | Orange = Contact | Pink = Skills | Cyan = Experience</div>
-      </div>
-    </div>
-  );
-};
-
-export default ControllerBody;
-</file>
-
 <file path="src/components/ContactSection.tsx">
 import { useState } from 'react';
 import { Disc } from 'lucide-react';
@@ -7287,8 +7226,89 @@ const ContactSection = () => {
 export default ContactSection;
 </file>
 
+<file path="src/components/controller/ControllerBody.tsx">
+import React from 'react';
+import DPad from './DPad';
+import ActionButtons from './ActionButtons';
+import { Direction } from './DPad';
+import { Button } from './types';
+
+interface ControllerBodyProps {
+  activeDirection: Direction;
+  activeButton: Button;
+  keyPressed: string | null;
+  onDirectionClick: (direction: Direction) => void;
+  onButtonClick: (button: Button) => void;
+}
+
+const ControllerBody = ({ 
+  activeDirection, 
+  activeButton, 
+  keyPressed,
+  onDirectionClick,
+  onButtonClick
+}: ControllerBodyProps) => {
+  return (
+    <div className="relative w-80 h-40 rounded-full shadow-xl">
+      {/* Controller Body with gradient and shadow */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-200 to-gray-400 rounded-[40px] shadow-inner border border-gray-400">
+        {/* Controller details - top inset */}
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 w-40 h-3 bg-gradient-to-b from-gray-600 to-gray-500 rounded-b-xl border-t-0 border border-gray-500"></div>
+        
+        {/* Controller details - bottom inset */}
+        <div className="absolute left-1/2 bottom-0 -translate-x-1/2 w-40 h-3 bg-gradient-to-b from-gray-500 to-gray-600 rounded-t-xl border-b-0 border border-gray-500"></div>
+      </div>
+
+      {/* D-pad */}
+      <DPad 
+        activeDirection={activeDirection} 
+        keyPressed={keyPressed} 
+        onDirectionClick={onDirectionClick} 
+      />
+      
+      {/* Center area with select/start buttons */}
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+        <div className="w-28 h-8 flex justify-between items-center transform rotate-[-20deg]">
+          <button 
+            className="w-10 h-2 bg-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 active:bg-gray-700 transition-colors"
+            aria-label="Select button"
+          ></button>
+          <button 
+            className="w-10 h-2 bg-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 active:bg-gray-700 transition-colors"
+            aria-label="Start button"
+          ></button>
+        </div>
+        <div className="mt-6 flex justify-center space-x-6">
+          <div className="text-[8px] text-arcade-pink font-press-start">SELECT</div>
+          <div className="text-[8px] text-arcade-pink font-press-start">START</div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <ActionButtons activeButton={activeButton} onButtonClick={onButtonClick} />
+
+      {/* Instruction label with button mappings */}
+      <div className="absolute -bottom-14 left-1/2 -translate-x-1/2 text-xs text-arcade-cyan/90 font-vt323 flex flex-col items-center bg-black/30 p-2 rounded-md">
+        <div className="whitespace-nowrap">◀/▶ = Switch Tabs | ▲/▼ = Scroll</div>
+        <div className="whitespace-nowrap mt-1">
+          <span className="text-arcade-purple">A</span>=About • 
+          <span className="text-arcade-pink">X</span>=Skills • 
+          <span className="text-arcade-cyan">Y</span>=Experience • 
+          <span className="text-arcade-orange">B</span>=Contact
+        </div>
+      </div>
+      
+      {/* Controller texture overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-[40px] pointer-events-none"></div>
+    </div>
+  );
+};
+
+export default ControllerBody;
+</file>
+
 <file path="src/components/controller/DPad.tsx">
-import React, { MouseEvent } from 'react';
+import React from 'react';
 import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'neutral';
@@ -7302,15 +7322,17 @@ interface DPadProps {
 const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
   // Direct handler to pass the direction to parent
   const handleClick = (direction: Direction) => {
-    console.log(`Clicking D-pad direction: ${direction}`);
-    // Call the parent handler directly - no event manipulation
     onDirectionClick(direction);
   };
+
+  // Helper to determine if a direction is active
+  const isActive = (direction: Direction) => 
+    activeDirection === direction || keyPressed === direction;
 
   return (
     <div className="absolute left-6 top-1/2 -translate-y-1/2 w-20 h-20 bg-gray-400 rounded-full flex items-center justify-center">
       {/* D-pad cross */}
-      <div className="relative w-16 h-16 bg-gray-300 rounded-sm">
+      <div className="relative w-16 h-16 bg-gray-300 rounded-sm shadow-inner overflow-hidden">
         {/* D-pad border outline */}
         <div className="absolute inset-0 border-2 border-black rounded-sm"></div>
         
@@ -7318,53 +7340,83 @@ const DPad = ({ activeDirection, keyPressed, onDirectionClick }: DPadProps) => {
         <button 
           onClick={() => handleClick('up')}
           type="button"
-          className={`absolute w-5 h-5 top-0 left-1/2 -translate-x-1/2 -translate-y-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
-            activeDirection === 'up' || keyPressed === 'up' ? 'text-arcade-cyan' : 'text-gray-600'
-          }`}
+          className={`absolute w-5 h-5 top-0 left-1/2 -translate-x-1/2 -translate-y-0 
+            flex items-center justify-center
+            ${isActive('up') 
+              ? 'bg-gray-500 shadow-[0_0_4px_rgba(0,0,0,0.5)_inset] transform scale-105' 
+              : 'bg-gray-300 hover:bg-gray-400'} 
+            transition-all duration-100`}
           aria-label="Move up"
         >
-          <ArrowUp size={14} className={`${keyPressed === 'up' || activeDirection === 'up' ? 'text-black' : 'text-gray-600'}`} />
+          <ArrowUp 
+            size={14} 
+            className={`${isActive('up') ? 'text-white' : 'text-gray-600'} transition-colors`} 
+          />
         </button>
         
         {/* Down button */}
         <button 
           onClick={() => handleClick('down')}
           type="button"
-          className={`absolute w-5 h-5 bottom-0 left-1/2 -translate-x-1/2 translate-y-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
-            activeDirection === 'down' || keyPressed === 'down' ? 'text-arcade-cyan' : 'text-gray-600'
-          }`}
+          className={`absolute w-5 h-5 bottom-0 left-1/2 -translate-x-1/2 translate-y-0 
+            flex items-center justify-center
+            ${isActive('down') 
+              ? 'bg-gray-500 shadow-[0_0_4px_rgba(0,0,0,0.5)_inset] transform scale-105' 
+              : 'bg-gray-300 hover:bg-gray-400'} 
+            transition-all duration-100`}
           aria-label="Move down"
         >
-          <ArrowDown size={14} className={`${keyPressed === 'down' || activeDirection === 'down' ? 'text-black' : 'text-gray-600'}`} />
+          <ArrowDown 
+            size={14} 
+            className={`${isActive('down') ? 'text-white' : 'text-gray-600'} transition-colors`} 
+          />
         </button>
         
         {/* Left button */}
         <button 
           onClick={() => handleClick('left')}
           type="button"
-          className={`absolute w-5 h-5 left-0 top-1/2 -translate-y-1/2 -translate-x-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
-            activeDirection === 'left' || keyPressed === 'left' ? 'text-arcade-cyan' : 'text-gray-600'
-          }`}
+          className={`absolute w-5 h-5 left-0 top-1/2 -translate-y-1/2 -translate-x-0 
+            flex items-center justify-center
+            ${isActive('left') 
+              ? 'bg-gray-500 shadow-[0_0_4px_rgba(0,0,0,0.5)_inset] transform scale-105' 
+              : 'bg-gray-300 hover:bg-gray-400'} 
+            transition-all duration-100`}
           aria-label="Move left"
         >
-          <ArrowLeft size={14} className={`${keyPressed === 'left' || activeDirection === 'left' ? 'text-black' : 'text-gray-600'}`} />
+          <ArrowLeft 
+            size={14} 
+            className={`${isActive('left') ? 'text-white' : 'text-gray-600'} transition-colors`} 
+          />
         </button>
         
         {/* Right button */}
         <button 
           onClick={() => handleClick('right')}
           type="button"
-          className={`absolute w-5 h-5 right-0 top-1/2 -translate-y-1/2 translate-x-0 flex items-center justify-center bg-gray-300 hover:bg-gray-400 ${
-            activeDirection === 'right' || keyPressed === 'right' ? 'text-arcade-cyan' : 'text-gray-600'
-          }`}
+          className={`absolute w-5 h-5 right-0 top-1/2 -translate-y-1/2 translate-x-0 
+            flex items-center justify-center
+            ${isActive('right') 
+              ? 'bg-gray-500 shadow-[0_0_4px_rgba(0,0,0,0.5)_inset] transform scale-105' 
+              : 'bg-gray-300 hover:bg-gray-400'} 
+            transition-all duration-100`}
           aria-label="Move right"
         >
-          <ArrowRight size={14} className={`${keyPressed === 'right' || activeDirection === 'right' ? 'text-black' : 'text-gray-600'}`} />
+          <ArrowRight 
+            size={14} 
+            className={`${isActive('right') ? 'text-white' : 'text-gray-600'} transition-colors`} 
+          />
         </button>
 
         {/* Center circle */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-gray-400 rounded-full"></div>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-gray-400 rounded-full shadow-inner"></div>
       </div>
+      
+      {/* Direction labels */}
+      <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-white font-vt323">UP</div>
+      <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] text-white font-vt323">DOWN</div>
+      <div className="absolute -left-5 top-1/2 -translate-y-1/2 text-[10px] text-white font-vt323">LEFT</div>
+      <div className="absolute -right-5 top-1/2 -translate-y-1/2 text-[10px] text-white font-vt323">RIGHT</div>
     </div>
   );
 };
@@ -7384,8 +7436,6 @@ interface ActionButtonsProps {
 const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
   // Direct handler to pass the button to parent
   const handleClick = (button: Button) => {
-    console.log(`Clicking action button: ${button}`);
-    // Call the parent handler directly - no event manipulation
     onButtonClick(button);
   };
 
@@ -7395,7 +7445,8 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
         {/* Y button - Top - Experience */}
         <button 
           className={`absolute w-8 h-8 rounded-full top-0 left-1/2 -translate-x-1/2 -translate-y-1/4 
-          ${activeButton === 'y' ? 'bg-arcade-cyan border-2 border-gray-800' : 'bg-arcade-cyan hover:bg-arcade-cyan/80'}`}
+          ${activeButton === 'y' ? 'bg-arcade-cyan shadow-[0_0_6px_rgba(34,211,238,0.8)] transform scale-110' : 'bg-arcade-cyan hover:bg-arcade-cyan/80'} 
+          transition-all duration-150`}
           onClick={() => handleClick('y')}
           type="button"
           aria-label="Experience"
@@ -7406,7 +7457,8 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
         {/* X button - Left - Skills */}
         <button 
           className={`absolute w-8 h-8 rounded-full top-1/2 left-0 -translate-y-1/2 -translate-x-1/4 
-          ${activeButton === 'x' ? 'bg-arcade-pink border-2 border-gray-800' : 'bg-arcade-pink hover:bg-arcade-pink/80'}`}
+          ${activeButton === 'x' ? 'bg-arcade-pink shadow-[0_0_6px_rgba(236,72,153,0.8)] transform scale-110' : 'bg-arcade-pink hover:bg-arcade-pink/80'} 
+          transition-all duration-150`}
           onClick={() => handleClick('x')}
           type="button"
           aria-label="Skills"
@@ -7417,7 +7469,8 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
         {/* B button - Right - Contact */}
         <button 
           className={`absolute w-8 h-8 rounded-full top-1/2 right-0 -translate-y-1/2 translate-x-1/4 
-          ${activeButton === 'b' ? 'bg-arcade-orange border-2 border-gray-800' : 'bg-arcade-orange hover:bg-arcade-orange/80'}`}
+          ${activeButton === 'b' ? 'bg-arcade-orange shadow-[0_0_6px_rgba(249,115,22,0.8)] transform scale-110' : 'bg-arcade-orange hover:bg-arcade-orange/80'} 
+          transition-all duration-150`}
           onClick={() => handleClick('b')}
           type="button"
           aria-label="Contact"
@@ -7428,13 +7481,20 @@ const ActionButtons = ({ activeButton, onButtonClick }: ActionButtonsProps) => {
         {/* A button - Bottom - About */}
         <button 
           className={`absolute w-8 h-8 rounded-full bottom-0 left-1/2 -translate-x-1/2 translate-y-1/4 
-          ${activeButton === 'a' ? 'bg-arcade-purple border-2 border-gray-800' : 'bg-arcade-purple hover:bg-arcade-purple/80'}`}
+          ${activeButton === 'a' ? 'bg-arcade-purple shadow-[0_0_6px_rgba(155,135,245,0.8)] transform scale-110' : 'bg-arcade-purple hover:bg-arcade-purple/80'} 
+          transition-all duration-150`}
           onClick={() => handleClick('a')}
           type="button"
           aria-label="About"
         >
           <Gamepad size={16} className="absolute inset-0 m-auto text-black" />
         </button>
+        
+        {/* Button labels */}
+        <div className="absolute -right-14 top-0 text-[10px] text-arcade-cyan font-vt323">Y</div>
+        <div className="absolute -left-14 top-1/2 -translate-y-1/2 text-[10px] text-arcade-pink font-vt323">X</div>
+        <div className="absolute -right-14 top-1/2 -translate-y-1/2 text-[10px] text-arcade-orange font-vt323">B</div>
+        <div className="absolute -left-14 bottom-0 text-[10px] text-arcade-purple font-vt323">A</div>
       </div>
     </div>
   );
@@ -7453,10 +7513,18 @@ import ProjectsSection from './ProjectsSection';
 import ContactSection from './ContactSection';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// Create a context to share the current section across components
-export const NavigationContext = createContext({
+// Defined context interface for better type safety
+interface NavigationContextType {
+  currentSection: string;
+  setCurrentSection: (section: string) => void;
+  focusTab: (tabId: string) => void;
+}
+
+// Create a context with a default value
+export const NavigationContext = createContext<NavigationContextType>({
   currentSection: "about",
-  setCurrentSection: (section: string) => {},
+  setCurrentSection: () => {},
+  focusTab: () => {},
 });
 
 // Custom hook to use the navigation context
@@ -7466,63 +7534,78 @@ const ArcadeScreen = () => {
   const [loaded, setLoaded] = useState(false);
   const [currentSection, setCurrentSection] = useState("about");
   const tabsListRef = useRef<HTMLDivElement>(null);
+  const tabsRefs = useRef<Record<string, HTMLElement | null>>({
+    about: null,
+    skills: null,
+    experience: null,
+    contact: null
+  });
 
+  // Initialize tabs and focus handling
   useEffect(() => {
     // Simulate loading time for the retro effect
     const timer = setTimeout(() => {
       setLoaded(true);
       
-      // Once loaded, make sure the tabs are focused for keyboard navigation
+      // Once loaded, initialize tab references
       setTimeout(() => {
-        const activeTab = document.querySelector('[role="tab"][data-state="active"]');
-        if (activeTab) {
-          (activeTab as HTMLElement).focus();
+        // Get references to all tab elements
+        tabsRefs.current = {
+          about: document.getElementById('about-tab'),
+          skills: document.getElementById('skills-tab'),
+          experience: document.getElementById('experience-tab'),
+          contact: document.getElementById('contact-tab')
+        };
+        
+        // Click the about tab to initialize it
+        const aboutTab = tabsRefs.current.about;
+        if (aboutTab) {
+          aboutTab.click();
+          aboutTab.focus();
         }
-      }, 500);
-    }, 1000);
-
-    console.log("ArcadeScreen mounted - current section:", currentSection);
+      }, 300);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // Log section changes
-  useEffect(() => {
-    console.log("Section changed to:", currentSection);
-  }, [currentSection]);
+  // Function to explicitly focus a specific tab by id
+  const focusTab = (tabId: string) => {
+    const tabElement = document.getElementById(tabId);
+    if (tabElement) {
+      tabElement.click();
+      setTimeout(() => {
+        tabElement.focus();
+      }, 10);
+    }
+  };
 
-  // Explicit handler for tab changes to help with debugging
+  // Explicit handler for tab changes
   const handleTabChange = (value: string) => {
-    console.log(`Tab changed to: ${value}`);
     setCurrentSection(value);
     
-    // When tab changes, ensure proper focus management for keyboard navigation
+    // Ensure proper focus management for keyboard navigation
     setTimeout(() => {
-      const activeTab = document.querySelector(`[role="tab"][value="${value}"]`);
-      if (activeTab) {
-        (activeTab as HTMLElement).focus();
+      const tabId = `${value}-tab`;
+      focusTab(tabId);
+      
+      // Also scroll the content into view if needed
+      const contentElement = document.getElementById(`${value}-content`);
+      if (contentElement) {
+        contentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }, 10);
   };
 
-  // Add a focus handler to improve keyboard accessibility
-  const handleTabsListFocus = () => {
-    console.log("TabsList focused");
-    // Ensure an active tab is selected when tabList gets focus
-    const activeTab = document.querySelector('[role="tab"][data-state="active"]');
-    if (activeTab) {
-      (activeTab as HTMLElement).focus();
-    } else {
-      // If no active tab, focus the first one
-      const firstTab = document.querySelector('[role="tab"]');
-      if (firstTab) {
-        (firstTab as HTMLElement).focus();
-      }
-    }
+  // Context value with memoization to prevent unnecessary re-renders
+  const navigationContextValue = {
+    currentSection,
+    setCurrentSection,
+    focusTab
   };
 
   return (
-    <NavigationContext.Provider value={{ currentSection, setCurrentSection }}>
+    <NavigationContext.Provider value={navigationContextValue}>
       <div className="relative w-full min-h-screen flex flex-col items-center bg-arcade-darkPurple overflow-x-hidden">
         {/* CRT overlay effect */}
         <div className="absolute inset-0 pointer-events-none crt z-10">
@@ -7553,19 +7636,22 @@ const ArcadeScreen = () => {
                 value={currentSection} 
                 onValueChange={handleTabChange} 
                 className="w-full"
+                defaultValue="about"
               >
                 <div className="border-2 border-arcade-neonPink/50 rounded-md p-3 mb-8 bg-black/40 backdrop-blur">
                   <TabsList 
                     className="grid grid-cols-2 md:grid-cols-4 bg-transparent gap-2"
                     ref={tabsListRef}
-                    onFocus={handleTabsListFocus}
-                    tabIndex={0}
+                    role="tablist"
+                    aria-label="Resume Sections"
                   >
                     <TabsTrigger
                       value="about"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-purple data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-purple/50`}
-                      data-section="about"
                       id="about-tab"
+                      role="tab"
+                      aria-controls="about-content"
+                      aria-selected={currentSection === "about"}
                       data-tab="about"
                     >
                       <Gamepad size={16} />
@@ -7574,8 +7660,10 @@ const ArcadeScreen = () => {
                     <TabsTrigger
                       value="skills"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-pink data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-pink/50`}
-                      data-section="skills"
                       id="skills-tab"
+                      role="tab"
+                      aria-controls="skills-content"
+                      aria-selected={currentSection === "skills"}
                       data-tab="skills"
                     >
                       <Disc size={16} />
@@ -7584,8 +7672,10 @@ const ArcadeScreen = () => {
                     <TabsTrigger
                       value="experience"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-cyan data-[state=active]:text-black bg-arcade-darkPurple text-white/70 border border-arcade-cyan/50`}
-                      data-section="experience"
                       id="experience-tab"
+                      role="tab"
+                      aria-controls="experience-content"
+                      aria-selected={currentSection === "experience"}
                       data-tab="experience"
                     >
                       <Clock size={16} />
@@ -7594,8 +7684,10 @@ const ArcadeScreen = () => {
                     <TabsTrigger
                       value="contact"
                       className={`font-press-start text-xs flex gap-2 items-center data-[state=active]:bg-arcade-orange data-[state=active]:text-white bg-arcade-darkPurple text-white/70 border border-arcade-orange/50`}
-                      data-section="contact"
                       id="contact-tab"
+                      role="tab"
+                      aria-controls="contact-content"
+                      aria-selected={currentSection === "contact"}
                       data-tab="contact"
                     >
                       <Headphones size={16} />
@@ -7607,9 +7699,11 @@ const ArcadeScreen = () => {
                 <div className="border-2 border-arcade-cyan/50 rounded-md p-4 bg-black/40 backdrop-blur min-h-[50vh]">
                   <TabsContent 
                     value="about" 
-                    className="mt-0"
+                    className="mt-0 focus-visible:outline-none"
                     id="about-content"
-                    data-tab-content="about"
+                    role="tabpanel"
+                    aria-labelledby="about-tab"
+                    tabIndex={0}
                   >
                     <div className="text-white font-vt323 space-y-4">
                       <h2 className="text-2xl font-press-start text-arcade-cyan mb-4">ABOUT ME</h2>
@@ -7658,34 +7752,48 @@ const ArcadeScreen = () => {
                       
                       <div className="mt-8 p-4 border border-arcade-purple/30 rounded-md bg-gradient-to-r from-arcade-darkPurple to-black">
                         <h3 className="text-arcade-purple font-press-start text-sm mb-2">GAME CONTROLS</h3>
-                        <p>Use the controller at the bottom of the screen or keyboard arrow keys to navigate through my resume. Press 'A' to select or 'B' to go back.</p>
+                        <p>Use the controller at the bottom of the screen or keyboard arrow keys to navigate through my resume.</p>
+                        <ul className="mt-2 text-sm">
+                          <li><span className="text-arcade-purple">Purple Button (A)</span>: About tab</li>
+                          <li><span className="text-arcade-pink">Pink Button (X)</span>: Skills tab</li>
+                          <li><span className="text-arcade-cyan">Cyan Button (Y)</span>: Experience tab</li>
+                          <li><span className="text-arcade-orange">Orange Button (B)</span>: Contact tab</li>
+                          <li><span className="text-white">D-pad Left/Right</span>: Navigate between tabs</li>
+                          <li><span className="text-white">D-pad Up/Down</span>: Scroll content</li>
+                        </ul>
                       </div>
                     </div>
                   </TabsContent>
 
                   <TabsContent 
                     value="skills" 
-                    className="mt-0"
+                    className="mt-0 focus-visible:outline-none"
                     id="skills-content"
-                    data-tab-content="skills"
+                    role="tabpanel"
+                    aria-labelledby="skills-tab"
+                    tabIndex={0}
                   >
                     <SkillsSection />
                   </TabsContent>
 
                   <TabsContent 
                     value="experience" 
-                    className="mt-0"
+                    className="mt-0 focus-visible:outline-none"
                     id="experience-content"
-                    data-tab-content="experience"
+                    role="tabpanel"
+                    aria-labelledby="experience-tab"
+                    tabIndex={0}
                   >
                     <ExperienceSection />
                   </TabsContent>
 
                   <TabsContent 
                     value="contact" 
-                    className="mt-0"
+                    className="mt-0 focus-visible:outline-none"
                     id="contact-content"
-                    data-tab-content="contact"
+                    role="tabpanel"
+                    aria-labelledby="contact-tab"
+                    tabIndex={0}
                   >
                     <ContactSection />
                   </TabsContent>
@@ -7712,7 +7820,7 @@ export default ArcadeScreen;
 </file>
 
 <file path="src/hooks/useControllerNavigation.ts">
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Direction } from '@/components/controller/DPad';
 import { Button } from '@/components/controller/types';
 
@@ -7722,124 +7830,75 @@ export const useControllerNavigation = () => {
   const [lastScrollPosition, setLastScrollPosition] = useState(0);
   const [keyPressed, setKeyPressed] = useState<string | null>(null);
   
-  // Set up event listeners for navigation
+  // Set up event listeners for basic navigation
   useEffect(() => {
     // Scroll handling for up/down directions
     const handleScroll = () => {
       const currentScroll = window.scrollY;
-      if (currentScroll > lastScrollPosition) {
-        setActiveDirection('down');
-      } else if (currentScroll < lastScrollPosition) {
-        setActiveDirection('up');
-      }
-      setLastScrollPosition(currentScroll);
-
-      // Reset direction after a short delay
-      setTimeout(() => {
-        setActiveDirection('neutral');
-      }, 150);
-    };
-
-    // Global event handler for keyboard navigation
-    const handleKeyDown = (e: KeyboardEvent) => {
-      console.log(`Key pressed: ${e.key}`);
       
-      switch (e.key) {
-        case 'ArrowUp':
-          setActiveDirection('up');
-          window.scrollBy(0, -100);
-          setKeyPressed('up');
-          break;
-        case 'ArrowDown':
+      // Only update direction if there's a significant change
+      if (Math.abs(currentScroll - lastScrollPosition) > 10) {
+        if (currentScroll > lastScrollPosition) {
           setActiveDirection('down');
-          window.scrollBy(0, 100);
-          setKeyPressed('down');
-          break;
-        case 'ArrowLeft':
-          setActiveDirection('left');
-          setKeyPressed('left');
-          break;
-        case 'ArrowRight':
-          setActiveDirection('right');
-          setKeyPressed('right');
-          break;
-        case 'a':
-        case 'A':
-          setActiveButton('a');
-          break;
-        case 'b':
-        case 'B':
-          setActiveButton('b');
-          break;
-        case 'x':
-        case 'X':
-          setActiveButton('x');
-          break;
-        case 'y':
-        case 'Y':
-          setActiveButton('y');
-          break;
-        default:
-          break;
+        } else if (currentScroll < lastScrollPosition) {
+          setActiveDirection('up');
+        }
+        
+        setLastScrollPosition(currentScroll);
+
+        // Reset direction after a short delay
+        const timer = setTimeout(() => {
+          setActiveDirection('neutral');
+        }, 150);
+        
+        return () => clearTimeout(timer);
       }
     };
 
-    const handleKeyUp = () => {
-      setActiveDirection('neutral');
-      setActiveButton(null);
-      setKeyPressed(null);
-    };
-
-    // Add all event listeners
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollPosition]);
 
-  // Function to handle D-pad button click
-  const handleDPadClick = (direction: Direction) => {
-    console.log(`D-pad clicked: ${direction}`);
+  // Function to handle D-pad button click - only handles scrolling
+  const handleDPadClick = useCallback((direction: Direction) => {
     setActiveDirection(direction);
     
-    switch (direction) {
-      case 'up':
-        window.scrollBy(0, -150);
-        break;
-      case 'down':
-        window.scrollBy(0, 150);
-        break;
-      // We don't handle left/right here anymore - this is delegated to the RetroController
-      default:
-        break;
+    // Handle scrolling for up/down
+    if (direction === 'up') {
+      window.scrollBy({ top: -150, behavior: 'smooth' });
+    } else if (direction === 'down') {
+      window.scrollBy({ top: 150, behavior: 'smooth' });
     }
     
+    // Left/right navigation is handled in RetroController component
+    
     // Return to neutral position after a short delay
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setActiveDirection('neutral');
     }, 200);
-  };
+    
+    return () => clearTimeout(timer);
+  }, []);
 
-  // Function to handle action button click
-  const handleButtonClick = (button: Button) => {
-    console.log(`Button clicked: ${button}`);
+  // Function to handle action button click - visual feedback only
+  const handleButtonClick = useCallback((button: Button) => {
     setActiveButton(button);
     
     // Reset button after a short delay
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setActiveButton(null);
     }, 150);
-  };
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   return {
     activeDirection,
     activeButton,
     keyPressed,
+    setActiveDirection,
+    setActiveButton,
+    setKeyPressed,
     handleDPadClick,
     handleButtonClick
   };
@@ -7847,30 +7906,31 @@ export const useControllerNavigation = () => {
 </file>
 
 <file path="src/components/RetroController.tsx">
-import { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import ControllerBody from './controller/ControllerBody';
 import { useControllerNavigation } from '@/hooks/useControllerNavigation';
 import { useControllerVisibility } from '@/hooks/useControllerVisibility';
 import { Direction } from './controller/DPad';
 import { Button } from './controller/types';
-import { useNavigation } from './ArcadeScreen'; // Import for direct tab control
+import { useNavigation } from './ArcadeScreen';
 
 // Define tab order for consistent navigation
 const TAB_VALUES = ['about', 'skills', 'experience', 'contact'];
 
 const RetroController = () => {
   const controllerRef = useRef<HTMLDivElement>(null);
-  const { currentSection, setCurrentSection } = useNavigation(); // Get navigation context
+  const { currentSection, setCurrentSection, focusTab } = useNavigation();
   const { 
     activeDirection, 
     activeButton, 
     keyPressed, 
     handleDPadClick: originalHandleDPadClick,
-    handleButtonClick: originalHandleButtonClick
+    handleButtonClick: originalHandleButtonClick,
+    setActiveDirection,
+    setActiveButton
   } = useControllerNavigation();
   const { isVisible } = useControllerVisibility(controllerRef);
-  const initialized = useRef(false);
-  const [navigationDebug, setNavigationDebug] = useState<string>('');
+  const [initialized, setInitialized] = useState(false);
 
   // Map for button to tab values
   const buttonToTabMap: Record<string, string> = {
@@ -7880,125 +7940,112 @@ const RetroController = () => {
     'y': 'experience'
   };
 
-  // Programmatically click the tab element
-  const clickTabElement = (tabValue: string) => {
-    const tabId = `${tabValue}-tab`;
-    const tabElement = document.getElementById(tabId);
-    if (tabElement) {
-      // Use the actual DOM click method to trigger the tab
-      tabElement.click();
-      return true;
-    }
-    return false;
-  };
-
-  // Simple initialization to ensure a tab is selected on mount
+  // Initialize on mount - ensure a tab is selected
   useEffect(() => {
-    console.log("RetroController mounted, initializing navigation");
-    setNavigationDebug('Controller mounted');
-
-    if (!initialized.current) {
-      initialized.current = true;
-      // Only set the section if it's not already set
+    if (!initialized) {
+      // Default to 'about' if no valid section is selected
       if (!TAB_VALUES.includes(currentSection)) {
-        // Set state AND click the DOM element
         setCurrentSection('about');
-        setTimeout(() => clickTabElement('about'), 100);
-        setNavigationDebug('Initialized to about tab');
+        focusTab('about-tab');
+      } else {
+        // Ensure the current section is properly focused
+        focusTab(`${currentSection}-tab`);
       }
+      setInitialized(true);
     }
-  }, [currentSection, setCurrentSection]);
+  }, [currentSection, initialized, setCurrentSection, focusTab]);
 
   // Enhanced handler for D-pad clicks with direct tab navigation
   const onDirectionClick = (direction: Direction) => {
-    console.log(`RetroController: Direction clicked: ${direction}`);
-    setNavigationDebug(`Direction clicked: ${direction}`);
+    // Always call the original handler first for visual feedback
+    originalHandleDPadClick(direction);
     
     // For left/right, navigate between tabs
     if (direction === 'left' || direction === 'right') {
       // Find current position in tab order
       const currentIndex = TAB_VALUES.indexOf(currentSection);
       if (currentIndex !== -1) {
-        // Calculate next tab index
+        // Calculate next tab index with wrap-around
         const newIndex = direction === 'left'
           ? (currentIndex - 1 + TAB_VALUES.length) % TAB_VALUES.length
           : (currentIndex + 1) % TAB_VALUES.length;
         
         const newTab = TAB_VALUES[newIndex];
-        
-        // Update state AND programmatically click the tab
         setCurrentSection(newTab);
-        setTimeout(() => clickTabElement(newTab), 10);
-        setNavigationDebug(`Navigated to ${newTab}`);
+        focusTab(`${newTab}-tab`);
       }
     }
-    
-    // Call original handler for other actions (scroll up/down)
-    originalHandleDPadClick(direction);
   };
 
-  // Enhanced handler for button clicks with direct tab setting
+  // Enhanced handler for button clicks
   const onButtonClick = (button: Button) => {
-    console.log(`RetroController: Button clicked: ${button}`);
-    setNavigationDebug(`Button clicked: ${button}`);
+    // Always call the original handler first for visual feedback
+    originalHandleButtonClick(button);
     
-    // If clicked a mapped button, change to the corresponding tab
+    // If clicked a mapped button, navigate to the corresponding tab
     if (button && buttonToTabMap[button]) {
       const tabName = buttonToTabMap[button];
-      
-      // Update state AND programmatically click the tab
       setCurrentSection(tabName);
-      setTimeout(() => clickTabElement(tabName), 10);
-      setNavigationDebug(`Activated ${tabName} tab`);
+      focusTab(`${tabName}-tab`);
     }
-    
-    // Call original handler for state updates
-    originalHandleButtonClick(button);
   };
 
-  // Manually focus the active tab when keyboard events occur
+  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (['ArrowLeft', 'ArrowRight', 'a', 'b', 'x', 'y', 'A', 'B', 'X', 'Y'].includes(e.key)) {
-        // Ensure we have focus on the tab container for keyboard navigation to work
-        const tabsList = document.querySelector('[role="tablist"]');
-        if (tabsList) {
-          (tabsList as HTMLElement).focus();
-        }
+      // Update direction based on arrow keys
+      if (e.key === 'ArrowLeft') {
+        setActiveDirection('left');
+        onDirectionClick('left');
+      } else if (e.key === 'ArrowRight') {
+        setActiveDirection('right');
+        onDirectionClick('right');
+      } else if (e.key === 'ArrowUp') {
+        setActiveDirection('up');
+        onDirectionClick('up');
+      } else if (e.key === 'ArrowDown') {
+        setActiveDirection('down');
+        onDirectionClick('down');
+      }
+      
+      // Handle button presses
+      const buttonKey = e.key.toLowerCase();
+      if (['a', 'b', 'x', 'y'].includes(buttonKey)) {
+        setActiveButton(buttonKey as Button);
+        onButtonClick(buttonKey as Button);
       }
     };
     
+    const handleKeyUp = () => {
+      // Reset active states
+      setActiveDirection('neutral');
+      setActiveButton(null);
+    };
+    
+    // Add event listeners
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
     
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [currentSection]); // Re-attach when current section changes
 
   return (
     <div 
       ref={controllerRef} 
       className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-20'}`}
       onMouseEnter={() => {
-        // Ensure tabs are initialized when mouse hovers over controller
-        if (!initialized.current) {
-          initialized.current = true;
-          if (!TAB_VALUES.includes(currentSection)) {
-            setCurrentSection('about');
-            setTimeout(() => clickTabElement('about'), 100);
-          }
-          setNavigationDebug(`Initialized on mouse enter`);
+        // Make sure navigation is initialized on hover
+        if (!initialized) {
+          const initialTab = TAB_VALUES.includes(currentSection) ? currentSection : 'about';
+          setCurrentSection(initialTab);
+          focusTab(`${initialTab}-tab`);
+          setInitialized(true);
         }
       }}
     >
-      {/* Add debugging info, only visible during development */}
-      {process.env.NODE_ENV !== 'production' && (
-        <div className="absolute -top-24 left-0 right-0 p-2 bg-black/80 text-white text-xs max-w-xs mx-auto">
-          <div>Current Section: {currentSection}</div>
-          <div>Debug: {navigationDebug}</div>
-        </div>
-      )}
-      
       <ControllerBody 
         activeDirection={activeDirection}
         activeButton={activeButton}
